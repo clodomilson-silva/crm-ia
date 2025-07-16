@@ -1,0 +1,60 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Client {
+  id          String   @id @default(cuid())
+  name        String
+  email       String   @unique
+  phone       String?
+  clientType  String   // 'prospect', 'lead', 'customer', 'inactive'
+  leadScore   Int      @default(0)
+  status      String   @default("active") // 'active', 'inactive'
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  interactions Interaction[]
+  tasks        Task[]
+  
+  @@map("clients")
+}
+
+model Interaction {
+  id        String   @id @default(cuid())
+  clientId  String
+  type      String   // 'email', 'call', 'whatsapp', 'meeting'
+  content   String
+  aiGenerated Boolean @default(false)
+  createdAt DateTime @default(now())
+  
+  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@map("interactions")
+}
+
+model Task {
+  id          String   @id @default(cuid())
+  clientId    String
+  title       String
+  description String?
+  type        String   // 'call', 'email', 'whatsapp', 'meeting', 'follow-up'
+  priority    String   @default("medium") // 'low', 'medium', 'high'
+  status      String   @default("pending") // 'pending', 'completed', 'cancelled'
+  dueDate     DateTime?
+  aiSuggested Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  
+  @@map("tasks")
+}
