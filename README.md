@@ -225,8 +225,8 @@ Edite `src/lib/openai.ts` para:
 ## 📞 Suporte
 
 - **Documentação**: Este README
-- **Issues**: Abra uma issue no GitHub
-- **Discord**: [Seu servidor Discord]
+- **Issues**: issue no GitHub
+- **Discord**: dev_clodomilson
 
 ## 📄 Licença
 
