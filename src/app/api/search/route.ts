@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { searchClients } from '@/lib/openai'
+import { searchClients } from '@/lib/deepseek'
 
 export async function GET(request: Request) {
   try {

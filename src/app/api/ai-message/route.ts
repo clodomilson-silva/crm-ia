@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { generateMessage } from '@/lib/openai'
+import { generateMessage } from '@/lib/deepseek'
 
 export async function POST(req: Request) {
   try {

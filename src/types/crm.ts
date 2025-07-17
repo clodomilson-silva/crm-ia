@@ -1,5 +1,7 @@
 import { Client, Interaction, Task } from '@prisma/client'
 
+export type { Client, Interaction, Task } from '@prisma/client'
+
 export type ClientWithRelations = Client & {
   interactions: Interaction[]
   tasks: Task[]

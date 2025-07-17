@@ -3,6 +3,8 @@
 import { useState, useEffect } from 'react'
 import { Search, Filter, Mail, Phone, User, TrendingUp } from 'lucide-react'
 import axios from 'axios'
+import ClientDetailModal from './ClientDetailModal'
+import { ClientWithRelations } from '@/types/crm'
 
 interface Client {
   id: string
@@ -28,9 +30,26 @@ interface Client {
 export default function ClientList() {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
+  const [selectedClient, setSelectedClient] = useState<ClientWithRelations | null>(null)
+  const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('')
   const [filterStatus, setFilterStatus] = useState('')
+
+  const handleViewDetails = async (clientId: string) => {
+    try {
+      const response = await axios.get(`/api/clients/${clientId}`)
+      setSelectedClient(response.data.client)
+      setIsDetailModalOpen(true)
+    } catch (error) {
+      console.error('Erro ao carregar detalhes do cliente:', error)
+    }
+  }
+
+  const handleCloseModal = () => {
+    setIsDetailModalOpen(false)
+    setSelectedClient(null)
+  }
 
   useEffect(() => {
     const loadClientsWithParams = async () => {
@@ -195,7 +214,10 @@ export default function ClientList() {
                   </div>
                   
                   <div className="flex items-center space-x-2">
-                    <button className="px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors">
+                    <button 
+                      onClick={() => handleViewDetails(client.id)}
+                      className="px-3 py-1 text-sm text-blue-600 border border-blue-600 rounded hover:bg-blue-50 transition-colors"
+                    >
                       Ver Detalhes
                     </button>
                     <button className="px-3 py-1 text-sm text-green-600 border border-green-600 rounded hover:bg-green-50 transition-colors">
@@ -208,6 +230,15 @@ export default function ClientList() {
           </div>
         )}
       </div>
+      
+      {/* Modal de Detalhes do Cliente */}
+      {selectedClient && (
+        <ClientDetailModal 
+          client={selectedClient} 
+          isOpen={!!selectedClient}
+          onClose={() => setSelectedClient(null)} 
+        />
+      )}
     </div>
   )
 }

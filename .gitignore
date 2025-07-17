@@ -38,6 +38,12 @@ yarn-error.log*
 .env.production.local
 .env.*
 
+# Documentação de configuração e testes (sensível)
+DEEPSEEK_SETUP.md
+TESTE_FUNCIONALIDADES.md
+*_SETUP.md
+*_TEST*.md
+
 # Database
 *.db
 *.sqlite

@@ -1,6 +1,6 @@
 # 🤖 CRM com IA - Sistema Inteligente de Gestão de Clientes
 
-Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **OpenAI**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
+Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **DeepSeek**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
 
 ## ✨ Funcionalidades
 
@@ -36,13 +36,17 @@ npm run db:push
 npm run db:seed
 ```
 
-### 3. Configure a API da OpenAI
+### 3. Configure a API da DeepSeek
 
-Edite o arquivo `.env` e adicione sua chave da OpenAI:
+Edite o arquivo `.env.local` e adicione sua chave da DeepSeek:
 
 ```env
-OPENAI_API_KEY=sk-proj-sua-chave-aqui
+DEEPSEEK_API_KEY=sk-sua-chave-aqui
 ```
+
+> 💡 **DeepSeek é 50-70% mais barato que OpenAI com qualidade similar!**
+> 
+> Veja o arquivo `DEEPSEEK_SETUP.md` para instruções detalhadas.
 
 ### 4. Execute o Projeto
 
@@ -100,9 +104,10 @@ Use **linguagem natural** para encontrar clientes:
 - **SQLite** para simplicidade (facilmente mudável)
 
 ### **Inteligência Artificial**
-- **OpenAI GPT-4** para análise e geração de conteúdo
+- **DeepSeek Chat** para análise e geração de conteúdo
 - **Análise semântica** para busca inteligente
 - **Lead scoring** baseado em padrões
+- **50-70% mais econômico** que soluções concorrentes
 
 ### **Banco de Dados**
 ```sql
@@ -140,7 +145,7 @@ Quando você cadastra um cliente, a IA analisa:
 - Tom: Amigável
 - Contexto: "Cliente interessado em automação, orçamento até R$ 50k"
 
-**Saída da IA:**
+**Saída da DeepSeek:**
 ```
 Oi João! 😊
 
@@ -203,10 +208,11 @@ DATABASE_URL="postgresql://user:password@localhost:5432/crm_ia"
 ```
 
 ### Personalizando a IA
-Edite `src/lib/openai.ts` para:
+Edite `src/lib/deepseek.ts` para:
 - Ajustar prompts
-- Mudar modelo (gpt-4, gpt-3.5-turbo)
+- Mudar temperatura para respostas mais criativas ou precisas
 - Adicionar novas funções de IA
+- Configurar rate limiting
 
 ### Adicionando Novos Campos
 1. Atualize `prisma/schema.prisma`

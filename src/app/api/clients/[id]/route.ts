@@ -1,15 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { analyzeClient } from '@/lib/openai'
+import { analyzeClient } from '@/lib/deepseek'
 import { UpdateClientData } from '@/types/crm'
 
 export async function GET(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     const client = await prisma.client.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: {
         interactions: {
           orderBy: { createdAt: 'desc' },
@@ -39,13 +41,14 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const data: UpdateClientData = await request.json()
+    const { id } = await params
 
     const existingClient = await prisma.client.findUnique({
-      where: { id: params.id },
+      where: { id },
       include: { interactions: true },
     })
 
@@ -70,7 +73,7 @@ export async function PUT(
     }
 
     const client = await prisma.client.update({
-      where: { id: params.id },
+      where: { id },
       data: {
         ...data,
         leadScore: newLeadScore,
@@ -93,11 +96,13 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
+    
     await prisma.client.delete({
-      where: { id: params.id },
+      where: { id },
     })
 
     return NextResponse.json({ message: 'Cliente removido com sucesso' })
