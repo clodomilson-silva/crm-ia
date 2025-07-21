@@ -73,16 +73,14 @@ async function main() {
         data: {
           clientId: client.id,
           type: 'email',
-          content: `Primeiro contato com ${client.name}. Apresentação da empresa e serviços.`,
-          aiGenerated: false,
+          content: `Primeiro contato com ${client.name}. Apresentação da empresa e serviços.`
         },
       }),
       prisma.interaction.create({
         data: {
           clientId: client.id,
           type: 'call',
-          content: `Ligação de follow-up com ${client.name}. Discussão sobre necessidades específicas.`,
-          aiGenerated: false,
+          content: `Ligação de follow-up com ${client.name}. Discussão sobre necessidades específicas.`
         },
       }),
     ])

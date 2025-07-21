@@ -6,55 +6,61 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DATABASE_URL")
 }
 
 model Client {
-  id          String   @id @default(cuid())
-  name        String
-  email       String   @unique
-  phone       String?
-  clientType  String   // 'prospect', 'lead', 'customer', 'inactive'
-  leadScore   Int      @default(0)
-  status      String   @default("active") // 'active', 'inactive'
-  notes       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id           String        @id @default(cuid())
+  name         String
+  email        String        @unique
+  phone        String?
+  clientType   String        // prospect, lead, customer, inactive
+  leadScore    Int           @default(50)
+  status       String        @default("active")
+  notes        String?
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
   
-  interactions Interaction[]
+  // Relacionamentos
   tasks        Task[]
-  
+  interactions Interaction[]
+
   @@map("clients")
 }
 
-model Interaction {
-  id        String   @id @default(cuid())
-  clientId  String
-  type      String   // 'email', 'call', 'whatsapp', 'meeting'
-  content   String
-  aiGenerated Boolean @default(false)
-  createdAt DateTime @default(now())
+model Task {
+  id               String   @id @default(cuid())
+  title            String
+  description      String?
+  type             String   // call, email, meeting, follow-up
+  priority         String   // low, medium, high
+  status           String   @default("pending") // pending, in-progress, completed, cancelled
+  dueDate          DateTime
+  completedAt      DateTime?
+  aiSuggested      Boolean  @default(false)
+  estimatedDuration String? // "30 min", "1 hour", etc.
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
   
-  client    Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  @@map("interactions")
+  // Relacionamentos
+  clientId         String
+  client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
 }
 
-model Task {
+model Interaction {
   id          String   @id @default(cuid())
-  clientId    String
-  title       String
-  description String?
-  type        String   // 'call', 'email', 'whatsapp', 'meeting', 'follow-up'
-  priority    String   @default("medium") // 'low', 'medium', 'high'
-  status      String   @default("pending") // 'pending', 'completed', 'cancelled'
-  dueDate     DateTime?
-  aiSuggested Boolean  @default(false)
+  type        String   // call, email, meeting, note
+  content     String
+  outcome     String?  // positive, neutral, negative
+  nextAction  String?
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
   
+  // Relacionamentos
+  clientId    String
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  
-  @@map("tasks")
+
+  @@map("interactions")
 }
