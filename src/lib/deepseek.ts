@@ -15,7 +15,8 @@ export interface AIAnalysis {
 export function isDeepSeekConfigured(): boolean {
   const apiKey = process.env.DEEPSEEK_API_KEY
   console.log('API Key check:', apiKey ? `${apiKey.substring(0, 10)}...` : 'Not found')
-  return !!apiKey && apiKey !== 'YOUR_DEEPSEEK_API_KEY'
+  // Temporariamente retornar false para usar fallback até resolver API key
+  return false
 }
 
 // Função para limpar resposta da IA e extrair JSON válido
@@ -197,56 +198,95 @@ function getFallbackMessage(messageType: string, clientName: string): string {
   const fallbackMessages = {
     'email': `Olá ${clientName},
 
-Espero que esteja bem! Entro em contato para dar continuidade ao nosso relacionamento comercial.
+Espero que esteja tudo bem! Estou entrando em contato para apresentar nossas soluções que podem beneficiar sua empresa.
 
-Gostaria de agendar uma conversa para discutirmos como podemos atender melhor às suas necessidades e apresentar soluções que podem ser valiosas para seu negócio.
+Nossa empresa oferece soluções personalizadas de CRM e automação que podem:
+• Aumentar a produtividade da sua equipe
+• Melhorar o relacionamento com clientes
+• Automatizar processos repetitivos
+• Gerar relatórios detalhados
 
-Qual seria um bom momento para conversarmos?
+Gostaria de agendar uma conversa para entender melhor suas necessidades e apresentar como podemos ajudar?
+
+Fico à disposição para qualquer esclarecimento.
 
 Atenciosamente,
-Equipe Comercial`,
+Equipe de Vendas`,
 
     'whatsapp': `Olá ${clientName}! 👋
 
-Espero que esteja tudo bem! 
+Tudo bem? Sou da equipe de vendas e gostaria de apresentar nossas soluções de CRM.
 
-Gostaria de conversar com você sobre como podemos ajudar seu negócio a crescer. Temos algumas soluções interessantes que podem fazer a diferença.
+Podemos ajudar sua empresa a:
+✅ Organizar melhor os clientes
+✅ Automatizar tarefas
+✅ Aumentar vendas
 
-Quando seria um bom momento para uma conversa rápida? 😊`,
+Tem 15 minutos para uma conversa? 😊`,
 
-    'call': `Roteiro para ligação - ${clientName}:
+    'proposal': `PROPOSTA COMERCIAL
 
-1. Cumprimento e apresentação
-2. Perguntar sobre as necessidades atuais do negócio
-3. Apresentar brevemente nossos serviços
-4. Agendar reunião para apresentação detalhada
-5. Definir próximos passos
+Cliente: ${clientName}
+Data: ${new Date().toLocaleDateString('pt-BR')}
 
-Pontos importantes:
-- Manter tom consultivo
-- Focar em agregar valor
-- Escutar mais do que falar`,
+SITUAÇÃO ATUAL
+Identificamos que sua empresa pode se beneficiar de uma solução mais eficiente de gestão de relacionamento com clientes.
 
-    'proposal': `Proposta Comercial - ${clientName}
+NOSSA SOLUÇÃO
+Sistema CRM completo com:
+• Gestão de contatos e leads
+• Automação de tarefas
+• Relatórios e analytics
+• Integração com ferramentas existentes
 
-Prezado(a) ${clientName},
+BENEFÍCIOS
+✓ Aumento de 30% na produtividade
+✓ Melhoria na organização de dados
+✓ Automatização de processos manuais
+✓ Visão 360° dos clientes
 
-Com base em nossa conversa, preparamos uma proposta personalizada que atende às necessidades específicas do seu negócio.
+INVESTIMENTO
+Planos flexíveis a partir de R$ 299/mês
+ROI médio de 300% em 6 meses
 
-Nossa solução oferece:
-• Otimização de processos
-• Aumento de produtividade
-• Redução de custos operacionais
-• Suporte especializado
+PRÓXIMOS PASSOS
+1. Apresentação personalizada
+2. Período de teste gratuito
+3. Implementação gradual
+4. Treinamento da equipe
 
-Estamos à disposição para apresentar os detalhes e esclarecer qualquer dúvida.
+Entre em contato para agendar uma demonstração!`,
 
-Atenciosamente,
-Equipe Comercial`
+    'call': `Roteiro para ligação - ${clientName}
+
+1. ABERTURA
+"Olá ${clientName}, aqui é [seu nome] da [empresa]. Como está? Tenho alguns minutos para conversar?"
+
+2. APRESENTAÇÃO
+"Estou entrando em contato porque nossa empresa ajuda empresas como a sua a otimizar o relacionamento com clientes."
+
+3. DESCOBERTA
+"Vocês atualmente usam algum sistema para gerenciar contatos e vendas?"
+"Quais são os principais desafios na gestão de clientes?"
+
+4. APRESENTAÇÃO DA SOLUÇÃO
+"Com base no que você me contou, nosso CRM pode ajudar especificamente com..."
+
+5. PRÓXIMOS PASSOS
+"Gostaria de agendar uma demonstração de 30 minutos? Quando seria melhor para você?"
+
+6. FECHAMENTO
+"Ótimo! Vou enviar um calendário por email. Tem mais alguma dúvida?"
+
+OBSERVAÇÕES:
+- Manter tom amigável e profissional
+- Ouvir mais do que falar
+- Fazer perguntas abertas
+- Confirmar próximos passos`
   }
 
   return fallbackMessages[messageType as keyof typeof fallbackMessages] || 
-    `Mensagem personalizada para ${clientName}. Entre em contato para mais informações sobre nossos serviços.`
+         `Mensagem personalizada para ${clientName} sobre nossos serviços.`
 }
 
 export async function searchClients(query: string, clients: ClientSearchData[]): Promise<ClientSearchData[]> {

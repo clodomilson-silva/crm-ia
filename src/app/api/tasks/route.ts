@@ -55,10 +55,24 @@ export async function POST(request: Request) {
       )
     }
 
+    // Converter dueDate ou usar data padrão
+    let dueDate: Date
+    if (data.dueDate) {
+      const convertedDate = convertToDateTime(data.dueDate)
+      dueDate = convertedDate || new Date(Date.now() + 24 * 60 * 60 * 1000) // +1 dia se conversão falhar
+    } else {
+      dueDate = new Date(Date.now() + 24 * 60 * 60 * 1000) // +1 dia por padrão
+    }
+
     const task = await prisma.task.create({
       data: {
-        ...data,
-        dueDate: convertToDateTime(data.dueDate),
+        clientId: data.clientId,
+        title: data.title,
+        description: data.description || '',
+        type: data.type,
+        priority: data.priority || 'medium',
+        dueDate,
+        aiSuggested: data.aiSuggested || false,
       },
       include: {
         client: {
