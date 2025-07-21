@@ -1,7 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, MessageSquare, Target, Calendar, Search, Plus } from 'lucide-react'
+import { Users, MessageSquare, Target, Calendar, Search } from 'lucide-react'
+import Header from '@/components/Header'
+import Navigation from '@/components/Navigation'
 import ClientList from '@/components/ClientList'
 import ClientForm from '@/components/ClientForm'
 import MessageGenerator from '@/components/MessageGenerator'
@@ -18,88 +20,70 @@ export default function HomePage() {
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: Target },
     { id: 'clients', label: 'Clientes', icon: Users },
-    { id: 'messages', label: 'Mensagens', icon: MessageSquare },
+    { id: 'messages', label: 'Mensagens IA', icon: MessageSquare },
     { id: 'tasks', label: 'Tarefas', icon: Calendar },
     { id: 'search', label: 'Busca IA', icon: Search },
   ]
 
-  return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">CRM com IA</h1>
-              <p className="text-sm text-gray-600">
-                Sistema inteligente de gestão de clientes
-              </p>
-            </div>
-            <button
-              onClick={() => setShowClientForm(true)}
-              className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="w-4 h-4 mr-2" />
-              Novo Cliente
-            </button>
-          </div>
-        </div>
-      </header>
+  const renderActiveContent = () => {
+    switch (activeTab) {
+      case 'dashboard':
+        return <Dashboard />
+      case 'clients':
+        return <ClientList />
+      case 'messages':
+        return <MessageGenerator />
+      case 'tasks':
+        return <TaskList />
+      case 'search':
+        return <SearchBar />
+      default:
+        return <Dashboard />
+    }
+  }
 
-      {/* Navigation */}
-      <nav className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            {tabs.map((tab) => {
-              const Icon = tab.icon
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id as ActiveTab)}
-                  className={`flex items-center px-3 py-4 text-sm font-medium border-b-2 transition-colors ${
-                    activeTab === tab.id
-                      ? 'border-blue-500 text-blue-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                >
-                  <Icon className="w-4 h-4 mr-2" />
-                  {tab.label}
-                </button>
-              )
-            })}
-          </div>
-        </div>
-      </nav>
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50/30">
+      {/* Modern Header */}
+      <Header 
+        onNewClient={() => setShowClientForm(true)}
+        activeTab={activeTab}
+      />
+
+      {/* Modern Navigation */}
+      <Navigation 
+        tabs={tabs}
+        activeTab={activeTab}
+        onTabChange={(tabId) => setActiveTab(tabId as ActiveTab)}
+      />
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === 'dashboard' && <Dashboard />}
-        {activeTab === 'clients' && <ClientList />}
-        {activeTab === 'messages' && <MessageGenerator />}
-        {activeTab === 'tasks' && <TaskList />}
-        {activeTab === 'search' && <SearchBar />}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200/60 min-h-[600px]">
+          <div className="p-6">
+            {renderActiveContent()}
+          </div>
+        </div>
       </main>
 
-      {/* Modal for Client Form */}
+      {/* Modal for New Client */}
       {showClientForm && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="flex justify-between items-center mb-4">
-              <h2 className="text-lg font-semibold">Novo Cliente</h2>
-              <button
-                onClick={() => setShowClientForm(false)}
-                className="text-gray-400 hover:text-gray-600"
-              >
-                ✕
-              </button>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center p-4 z-50">
+          <div className="bg-white rounded-xl shadow-2xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+            <div className="p-6">
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-900">Novo Cliente</h2>
+                <button
+                  onClick={() => setShowClientForm(false)}
+                  className="text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              <ClientForm />
             </div>
-            <ClientForm
-              onSuccess={() => {
-                setShowClientForm(false)
-                // Refresh the current view if needed
-              }}
-              onCancel={() => setShowClientForm(false)}
-            />
           </div>
         </div>
       )}

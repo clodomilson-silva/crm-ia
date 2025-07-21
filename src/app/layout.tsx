@@ -15,8 +15,15 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "CRM com IA - Gestão Inteligente de Clientes",
-  description: "Sistema CRM com inteligência artificial para controle de clientes, geração de leads e automação de mensagens",
+  title: "CRM AI - Sistema Inteligente de Gestão de Clientes",
+  description: "Sistema CRM com inteligência artificial para controle de clientes, geração de leads e automação de mensagens com DeepSeek",
+  keywords: "CRM, IA, Inteligência Artificial, Gestão de Clientes, DeepSeek, Automação",
+  authors: [{ name: "CRM AI Team" }],
+};
+
+export const viewport = {
+  width: 'device-width',
+  initialScale: 1,
 };
 
 export default function RootLayout({
@@ -27,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="pt-BR">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gray-50`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-50 to-blue-50/30 min-h-screen`}
         suppressHydrationWarning={true}
       >
         <HydrationFix />

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Users, Target, MessageSquare, Calendar } from 'lucide-react'
+import { Users, TrendingUp, Clock, Star, BarChart3 } from 'lucide-react'
 import axios from 'axios'
 
 interface DashboardStats {
@@ -105,125 +105,187 @@ export default function Dashboard() {
       title: 'Total de Clientes',
       value: stats.totalClients,
       icon: Users,
-      color: 'blue',
+      color: 'from-blue-500 to-blue-600',
+      bgColor: 'bg-blue-50',
+      iconColor: 'text-blue-600',
+      change: '+12%',
+      trend: 'up'
     },
     {
       title: 'Lead Score Médio',
       value: `${stats.avgLeadScore}%`,
-      icon: Target,
-      color: 'green',
+      icon: TrendingUp,
+      color: 'from-green-500 to-green-600',
+      bgColor: 'bg-green-50',
+      iconColor: 'text-green-600',
+      change: '+8%',
+      trend: 'up'
     },
     {
       title: 'Tarefas Pendentes',
       value: stats.pendingTasks,
-      icon: Calendar,
-      color: 'orange',
+      icon: Clock,
+      color: 'from-orange-500 to-orange-600',
+      bgColor: 'bg-orange-50',
+      iconColor: 'text-orange-600',
+      change: '-5%',
+      trend: 'down'
     },
     {
       title: 'Prospects Ativos',
       value: stats.prospects,
-      icon: MessageSquare,
-      color: 'purple',
+      icon: Star,
+      color: 'from-purple-500 to-purple-600',
+      bgColor: 'bg-purple-50',
+      iconColor: 'text-purple-600',
+      change: '+23%',
+      trend: 'up'
     },
   ]
 
   return (
     <div className="space-y-8">
-      {/* Cards de Estatísticas */}
+      {/* Header */}
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
+          <p className="text-gray-600">Visão geral do seu CRM com IA</p>
+        </div>
+        <div className="flex items-center space-x-2 text-sm text-gray-500">
+          <BarChart3 className="w-4 h-4" />
+          <span>Atualizado agora</span>
+        </div>
+      </div>
+
+      {/* Cards de Estatísticas Modernos */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         {statCards.map((card, index) => {
           const Icon = card.icon
           return (
-            <div key={index} className="bg-white rounded-lg shadow p-6">
-              <div className="flex items-center">
-                <div className={`flex-shrink-0 p-3 rounded-lg bg-${card.color}-100`}>
-                  <Icon className={`w-6 h-6 text-${card.color}-600`} />
+            <div key={index} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 hover:shadow-md transition-all duration-200 group">
+              <div className="flex items-center justify-between">
+                <div className={`flex-shrink-0 p-3 rounded-xl ${card.bgColor} group-hover:scale-110 transition-transform duration-200`}>
+                  <Icon className={`w-6 h-6 ${card.iconColor}`} />
                 </div>
-                <div className="ml-4">
-                  <p className="text-sm font-medium text-gray-500">{card.title}</p>
-                  <p className="text-2xl font-semibold text-gray-900">{card.value}</p>
+                <div className={`text-xs px-2 py-1 rounded-full ${
+                  card.trend === 'up' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                }`}>
+                  {card.change}
                 </div>
               </div>
+              <div className="mt-4">
+                <p className="text-sm font-medium text-gray-500">{card.title}</p>
+                <p className="text-3xl font-bold text-gray-900 mt-1">{card.value}</p>
+              </div>
+              <div className={`mt-4 h-1 bg-gradient-to-r ${card.color} rounded-full opacity-20 group-hover:opacity-40 transition-opacity duration-200`}></div>
             </div>
           )
         })}
       </div>
 
-      {/* Distribuição de Clientes */}
-      <div className="bg-white rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
-          Distribuição por Tipo de Cliente
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-600">{stats.prospects}</div>
-            <div className="text-sm text-gray-600">Prospects</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-green-600">{stats.leads}</div>
-            <div className="text-sm text-gray-600">Leads</div>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-600">{stats.customers}</div>
-            <div className="text-sm text-gray-600">Clientes</div>
+      {/* Distribuição de Clientes e Seções Modernas */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Distribuição por Tipo de Cliente */}
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+            <Users className="w-5 h-5 mr-2 text-blue-600" />
+            Distribuição de Clientes
+          </h3>
+          <div className="space-y-4">
+            <div className="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-blue-500 rounded-full mr-3"></div>
+                <span className="text-sm font-medium text-gray-700">Prospects</span>
+              </div>
+              <span className="text-lg font-bold text-blue-600">{stats.prospects}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-green-50 rounded-lg">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-green-500 rounded-full mr-3"></div>
+                <span className="text-sm font-medium text-gray-700">Leads</span>
+              </div>
+              <span className="text-lg font-bold text-green-600">{stats.leads}</span>
+            </div>
+            <div className="flex items-center justify-between p-3 bg-purple-50 rounded-lg">
+              <div className="flex items-center">
+                <div className="w-3 h-3 bg-purple-500 rounded-full mr-3"></div>
+                <span className="text-sm font-medium text-gray-700">Clientes</span>
+              </div>
+              <span className="text-lg font-bold text-purple-600">{stats.customers}</span>
+            </div>
           </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Clientes Recentes */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+            <Users className="w-5 h-5 mr-2 text-green-600" />
             Clientes Recentes
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {recentClients.length > 0 ? (
               recentClients.map((client) => (
-                <div key={client.id} className="flex items-center justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{client.name}</p>
-                    <p className="text-sm text-gray-500">{client.email}</p>
+                <div key={client.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors">
+                  <div className="flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full flex items-center justify-center text-white font-semibold text-sm">
+                      {client.name.charAt(0).toUpperCase()}
+                    </div>
+                    <div className="ml-3">
+                      <p className="font-medium text-gray-900">{client.name}</p>
+                      <p className="text-sm text-gray-500">{client.email}</p>
+                    </div>
                   </div>
                   <div className="text-right">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                    <span className={`inline-flex px-3 py-1 text-xs font-semibold rounded-full ${
                       client.clientType === 'customer' ? 'bg-green-100 text-green-800' :
                       client.clientType === 'lead' ? 'bg-blue-100 text-blue-800' :
                       'bg-gray-100 text-gray-800'
                     }`}>
                       {client.clientType}
                     </span>
-                    <p className="text-sm text-gray-500 mt-1">
-                      Score: {client.leadScore}%
-                    </p>
+                    <div className="flex items-center mt-1">
+                      <div className="w-12 bg-gray-200 rounded-full h-2 mr-2">
+                        <div 
+                          className="bg-gradient-to-r from-green-400 to-green-600 h-2 rounded-full" 
+                          style={{ width: `${client.leadScore}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-xs text-gray-500">{client.leadScore}%</span>
+                    </div>
                   </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">
-                Nenhum cliente cadastrado
+              <p className="text-gray-500 text-center py-8">
+                Nenhum cliente cadastrado ainda
               </p>
             )}
           </div>
         </div>
 
         {/* Tarefas Urgentes */}
-        <div className="bg-white rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-6 flex items-center">
+            <Clock className="w-5 h-5 mr-2 text-orange-600" />
             Tarefas Urgentes
           </h3>
-          <div className="space-y-3">
+          <div className="space-y-4">
             {urgentTasks.length > 0 ? (
               urgentTasks.map((task) => (
-                <div key={task.id} className="border-l-4 border-orange-400 pl-4">
-                  <p className="font-medium text-gray-900">{task.title}</p>
-                  <p className="text-sm text-gray-600">{task.client.name}</p>
-                  <p className="text-xs text-gray-500">
-                    Vencimento: {new Date(task.dueDate).toLocaleDateString('pt-BR')}
-                  </p>
+                <div key={task.id} className="relative pl-6 pb-4 border-l-2 border-orange-200 last:border-l-0">
+                  <div className="absolute w-3 h-3 bg-orange-500 rounded-full -left-1.5 top-2"></div>
+                  <div className="bg-orange-50 rounded-lg p-3">
+                    <p className="font-medium text-gray-900">{task.title}</p>
+                    <p className="text-sm text-gray-600 mt-1">{task.client.name}</p>
+                    <div className="flex items-center mt-2 text-xs text-orange-600">
+                      <Clock className="w-3 h-3 mr-1" />
+                      {new Date(task.dueDate).toLocaleDateString('pt-BR')}
+                    </div>
+                  </div>
                 </div>
               ))
             ) : (
-              <p className="text-gray-500 text-center py-4">
+              <p className="text-gray-500 text-center py-8">
                 Nenhuma tarefa urgente
               </p>
             )}
