@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import { Search, Filter, Mail, Phone, User, TrendingUp } from 'lucide-react'
 import axios from 'axios'
 import ClientDetailModal from './ClientDetailModal'
+import TaskForm from './TaskForm'
 import { ClientWithRelations } from '@/types/crm'
 
 interface Client {
@@ -31,6 +32,9 @@ export default function ClientList() {
   const [clients, setClients] = useState<Client[]>([])
   const [loading, setLoading] = useState(true)
   const [selectedClient, setSelectedClient] = useState<ClientWithRelations | null>(null)
+  const [showTaskForm, setShowTaskForm] = useState(false)
+  const [taskClientId, setTaskClientId] = useState<string>('')
+  const [taskClientName, setTaskClientName] = useState<string>('')
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState('')
   const [filterType, setFilterType] = useState('')
@@ -49,6 +53,17 @@ export default function ClientList() {
   const handleCloseModal = () => {
     setIsDetailModalOpen(false)
     setSelectedClient(null)
+  }
+
+  const handleCreateTask = (clientId: string, clientName: string) => {
+    setTaskClientId(clientId)
+    setTaskClientName(clientName)
+    setShowTaskForm(true)
+  }
+
+  const handleTaskCreated = () => {
+    // Recarregar a lista de clientes para atualizar as tarefas
+    window.location.reload()
   }
 
   useEffect(() => {
@@ -220,7 +235,10 @@ export default function ClientList() {
                     >
                       Ver Detalhes
                     </button>
-                    <button className="px-3 py-1 text-sm text-green-600 border border-green-600 rounded hover:bg-green-50 transition-colors">
+                    <button 
+                      onClick={() => handleCreateTask(client.id, client.name)}
+                      className="px-3 py-1 text-sm text-green-600 border border-green-600 rounded hover:bg-green-50 transition-colors"
+                    >
                       Criar Tarefa
                     </button>
                   </div>
@@ -237,6 +255,16 @@ export default function ClientList() {
           client={selectedClient} 
           isOpen={!!selectedClient}
           onClose={() => setSelectedClient(null)} 
+        />
+      )}
+
+      {/* Modal de Criar Tarefa */}
+      {showTaskForm && (
+        <TaskForm
+          clientId={taskClientId}
+          clientName={taskClientName}
+          onClose={() => setShowTaskForm(false)}
+          onTaskCreated={handleTaskCreated}
         />
       )}
     </div>

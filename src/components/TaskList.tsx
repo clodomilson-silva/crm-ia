@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Calendar, Clock, User, CheckCircle, AlertCircle } from 'lucide-react'
+import { Calendar, Clock, User, CheckCircle, AlertCircle, X, Brain } from 'lucide-react'
 import axios from 'axios'
 
 interface Task {
@@ -26,23 +26,24 @@ export default function TaskList() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
   const [filterPriority, setFilterPriority] = useState('')
+  const [generatingTasks, setGeneratingTasks] = useState(false)
+
+  const loadTasksWithParams = async () => {
+    try {
+      const params = new URLSearchParams()
+      if (filterStatus) params.append('status', filterStatus)
+      if (filterPriority) params.append('priority', filterPriority)
+
+      const response = await axios.get(`/api/tasks?${params.toString()}`)
+      setTasks(response.data.tasks)
+    } catch (error) {
+      console.error('Erro ao carregar tarefas:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   useEffect(() => {
-    const loadTasksWithParams = async () => {
-      try {
-        const params = new URLSearchParams()
-        if (filterStatus) params.append('status', filterStatus)
-        if (filterPriority) params.append('priority', filterPriority)
-
-        const response = await axios.get(`/api/tasks?${params.toString()}`)
-        setTasks(response.data.tasks)
-      } catch (error) {
-        console.error('Erro ao carregar tarefas:', error)
-      } finally {
-        setLoading(false)
-      }
-    }
-
     loadTasksWithParams()
   }, [filterStatus, filterPriority])
 
@@ -54,6 +55,69 @@ export default function TaskList() {
       ))
     } catch (error) {
       console.error('Erro ao atualizar tarefa:', error)
+    }
+  }
+
+  const removeCompletedTasks = async () => {
+    const completedAndCancelledTasks = tasks.filter(t => t.status === 'completed' || t.status === 'cancelled')
+    
+    if (completedAndCancelledTasks.length === 0) {
+      alert('Não há tarefas concluídas ou canceladas para remover.')
+      return
+    }
+
+    const completedCount = tasks.filter(t => t.status === 'completed').length
+    const cancelledCount = tasks.filter(t => t.status === 'cancelled').length
+    
+    let message = `Remover ${completedAndCancelledTasks.length} tarefa(s)?`
+    if (completedCount > 0 && cancelledCount > 0) {
+      message = `Remover ${completedCount} concluída(s) e ${cancelledCount} cancelada(s)?`
+    } else if (completedCount > 0) {
+      message = `Remover ${completedCount} tarefa(s) concluída(s)?`
+    } else {
+      message = `Remover ${cancelledCount} tarefa(s) cancelada(s)?`
+    }
+    message += ' Esta ação não pode ser desfeita.'
+
+    if (!confirm(message)) {
+      return
+    }
+
+    try {
+      for (const task of completedAndCancelledTasks) {
+        await axios.delete(`/api/tasks/${task.id}`)
+      }
+      
+      // Recarregar as tarefas
+      setTasks(tasks.filter(t => t.status !== 'completed' && t.status !== 'cancelled'))
+      alert('Tarefas removidas com sucesso!')
+    } catch (error) {
+      console.error('Erro ao remover tarefas:', error)
+      alert('Erro ao remover tarefas. Tente novamente.')
+    }
+  }
+
+  const generateDailyTasks = async () => {
+    setGeneratingTasks(true)
+    try {
+      const response = await axios.post('/api/daily-tasks', {}, {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      })
+      
+      if (response.data.success) {
+        alert(`${response.data.tasks.length} tarefas diárias geradas com sucesso pela IA!`)
+        // Recarregar as tarefas
+        loadTasksWithParams()
+      } else {
+        alert('Erro ao gerar tarefas diárias. Tente novamente.')
+      }
+    } catch (error) {
+      console.error('Erro ao gerar tarefas diárias:', error)
+      alert('Erro ao gerar tarefas diárias. Verifique se a API está configurada.')
+    } finally {
+      setGeneratingTasks(false)
     }
   }
 
@@ -99,6 +163,8 @@ export default function TaskList() {
 
   const pendingTasks = tasks.filter(t => t.status === 'pending')
   const completedTasks = tasks.filter(t => t.status === 'completed')
+  const cancelledTasks = tasks.filter(t => t.status === 'cancelled')
+  const completedAndCancelledTasks = tasks.filter(t => t.status === 'completed' || t.status === 'cancelled')
   const overdueTasks = pendingTasks.filter(t => isOverdue(t.dueDate))
   const todayTasks = pendingTasks.filter(t => isToday(t.dueDate))
 
@@ -145,42 +211,68 @@ export default function TaskList() {
             </div>
           </div>
         </div>
+        
+        <div className="bg-white rounded-lg shadow p-4">
+          <div className="flex items-center">
+            <X className="w-8 h-8 text-gray-600" />
+            <div className="ml-3">
+              <p className="text-sm font-medium text-gray-500">Canceladas</p>
+              <p className="text-2xl font-semibold text-gray-900">{cancelledTasks.length}</p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Filtros */}
       <div className="bg-white rounded-lg shadow p-4">
-        <div className="flex items-center space-x-4">
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todos os status</option>
-            <option value="pending">Pendentes</option>
-            <option value="completed">Concluídas</option>
-            <option value="cancelled">Canceladas</option>
-          </select>
-          
-          <select
-            value={filterPriority}
-            onChange={(e) => setFilterPriority(e.target.value)}
-            className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todas as prioridades</option>
-            <option value="high">Alta</option>
-            <option value="medium">Média</option>
-            <option value="low">Baixa</option>
-          </select>
-          
-          <button
-            onClick={() => {
-              setFilterStatus('')
-              setFilterPriority('')
-            }}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            Limpar Filtros
-          </button>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Todos os status</option>
+              <option value="pending">Pendentes</option>
+              <option value="completed">Concluídas</option>
+              <option value="cancelled">Canceladas</option>
+            </select>
+            
+            <select
+              value={filterPriority}
+              onChange={(e) => setFilterPriority(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              <option value="">Todas as prioridades</option>
+              <option value="high">Alta</option>
+              <option value="medium">Média</option>
+              <option value="low">Baixa</option>
+            </select>
+          </div>
+
+          {/* Botões de ação */}
+          <div className="flex gap-2">
+            {/* Botão para remover tarefas concluídas */}
+            {completedAndCancelledTasks.length > 0 && (
+              <button
+                onClick={removeCompletedTasks}
+                className="flex items-center px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+              >
+                <CheckCircle className="w-4 h-4 mr-2" />
+                Remover {completedAndCancelledTasks.length} Finalizada(s)
+              </button>
+            )}
+            
+            {/* Botão para gerar tarefas diárias com IA */}
+            <button
+              onClick={generateDailyTasks}
+              disabled={generatingTasks}
+              className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              <Brain className="w-4 h-4 mr-2" />
+              {generatingTasks ? 'Gerando...' : 'Gerar Tarefas IA'}
+            </button>
+          </div>
         </div>
       </div>
 

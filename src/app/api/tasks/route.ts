@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { CreateTaskData } from '@/types/crm'
+import { convertToDateTime } from '@/lib/dateUtils'
 
 export async function GET(request: Request) {
   try {
@@ -55,7 +56,10 @@ export async function POST(request: Request) {
     }
 
     const task = await prisma.task.create({
-      data,
+      data: {
+        ...data,
+        dueDate: convertToDateTime(data.dueDate),
+      },
       include: {
         client: {
           select: {
