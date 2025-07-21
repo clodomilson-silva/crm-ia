@@ -51,8 +51,17 @@ export async function POST(request: Request) {
       )
     }
 
+    // Filtrar campos que existem no modelo Prisma
+    const prismaData = {
+      clientId: data.clientId,
+      type: data.type,
+      content: data.content,
+      outcome: data.outcome,
+      nextAction: data.nextAction
+    }
+
     const interaction = await prisma.interaction.create({
-      data,
+      data: prismaData,
       include: {
         client: {
           select: {

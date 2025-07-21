@@ -208,11 +208,6 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
                           <span className="px-2 py-1 text-xs bg-blue-100 text-blue-800 rounded-full">
                             {interaction.type}
                           </span>
-                          {interaction.aiGenerated && (
-                            <span className="px-2 py-1 text-xs bg-purple-100 text-purple-800 rounded-full">
-                              IA Generated
-                            </span>
-                          )}
                         </div>
                         <p className="text-gray-700 whitespace-pre-wrap">{interaction.content}</p>
                       </div>

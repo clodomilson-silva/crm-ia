@@ -13,7 +13,9 @@ export interface AIAnalysis {
 
 // Função para verificar se a API key está configurada
 export function isDeepSeekConfigured(): boolean {
-  return !!process.env.DEEPSEEK_API_KEY && process.env.DEEPSEEK_API_KEY !== 'YOUR_DEEPSEEK_API_KEY'
+  const apiKey = process.env.DEEPSEEK_API_KEY
+  console.log('API Key check:', apiKey ? `${apiKey.substring(0, 10)}...` : 'Not found')
+  return !!apiKey && apiKey !== 'YOUR_DEEPSEEK_API_KEY'
 }
 
 // Função para limpar resposta da IA e extrair JSON válido
@@ -46,13 +48,15 @@ async function callDeepSeekAPI(messages: Array<{role: string, content: string}>,
     throw new Error('API DeepSeek não configurada')
   }
 
+  console.log('Making API call to OpenRouter...')
+  
   const response = await fetch(OPENROUTER_API_URL, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
       'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-      'HTTP-Referer': 'http://localhost:3000', // OpenRouter requer um referer
-      'X-Title': 'CRM com IA', // Título do app para OpenRouter
+      'HTTP-Referer': 'http://localhost:3000',
+      'X-Title': 'CRM com IA',
     },
     body: JSON.stringify({
       model: DEEPSEEK_MODEL,
@@ -62,8 +66,11 @@ async function callDeepSeekAPI(messages: Array<{role: string, content: string}>,
     }),
   })
 
+  console.log('Response status:', response.status)
+
   if (!response.ok) {
     const errorData = await response.json().catch(() => ({}))
+    console.error('API Error:', errorData)
     throw new Error(`OpenRouter API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`)
   }
 
@@ -178,17 +185,68 @@ Responda apenas com o texto da mensagem, sem aspas ou formatação adicional.
       { role: 'user', content: prompt }
     ], 0.8)
 
-    return response || 'Erro ao gerar mensagem'
+    return response || getFallbackMessage(messageType, clientName)
   } catch (error) {
     console.error('Erro ao gerar mensagem:', error)
-    if (error && typeof error === 'object' && 'message' in error) {
-      const errorMessage = (error as Error).message
-      if (errorMessage.includes('401') || errorMessage.includes('unauthorized')) {
-        return 'Erro: Chave da API DeepSeek (OpenRouter) inválida. Verifique sua configuração.'
-      }
-    }
-    return 'Erro ao gerar mensagem. Verifique sua configuração da API.'
+    return getFallbackMessage(messageType, clientName)
   }
+}
+
+// Função para gerar mensagens de fallback quando a API falha
+function getFallbackMessage(messageType: string, clientName: string): string {
+  const fallbackMessages = {
+    'email': `Olá ${clientName},
+
+Espero que esteja bem! Entro em contato para dar continuidade ao nosso relacionamento comercial.
+
+Gostaria de agendar uma conversa para discutirmos como podemos atender melhor às suas necessidades e apresentar soluções que podem ser valiosas para seu negócio.
+
+Qual seria um bom momento para conversarmos?
+
+Atenciosamente,
+Equipe Comercial`,
+
+    'whatsapp': `Olá ${clientName}! 👋
+
+Espero que esteja tudo bem! 
+
+Gostaria de conversar com você sobre como podemos ajudar seu negócio a crescer. Temos algumas soluções interessantes que podem fazer a diferença.
+
+Quando seria um bom momento para uma conversa rápida? 😊`,
+
+    'call': `Roteiro para ligação - ${clientName}:
+
+1. Cumprimento e apresentação
+2. Perguntar sobre as necessidades atuais do negócio
+3. Apresentar brevemente nossos serviços
+4. Agendar reunião para apresentação detalhada
+5. Definir próximos passos
+
+Pontos importantes:
+- Manter tom consultivo
+- Focar em agregar valor
+- Escutar mais do que falar`,
+
+    'proposal': `Proposta Comercial - ${clientName}
+
+Prezado(a) ${clientName},
+
+Com base em nossa conversa, preparamos uma proposta personalizada que atende às necessidades específicas do seu negócio.
+
+Nossa solução oferece:
+• Otimização de processos
+• Aumento de produtividade
+• Redução de custos operacionais
+• Suporte especializado
+
+Estamos à disposição para apresentar os detalhes e esclarecer qualquer dúvida.
+
+Atenciosamente,
+Equipe Comercial`
+  }
+
+  return fallbackMessages[messageType as keyof typeof fallbackMessages] || 
+    `Mensagem personalizada para ${clientName}. Entre em contato para mais informações sobre nossos serviços.`
 }
 
 export async function searchClients(query: string, clients: ClientSearchData[]): Promise<ClientSearchData[]> {

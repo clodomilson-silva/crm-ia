@@ -58,7 +58,6 @@ export default function MessageGenerator() {
           clientId: client.id,
           type: messageType,
           content: response.data.message,
-          aiGenerated: true,
         })
       }
     } catch (error) {

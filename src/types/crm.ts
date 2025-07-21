@@ -29,7 +29,8 @@ export interface CreateInteractionData {
   clientId: string
   type: 'email' | 'call' | 'whatsapp' | 'meeting'
   content: string
-  aiGenerated?: boolean
+  outcome?: string
+  nextAction?: string
 }
 
 export interface CreateTaskData {
