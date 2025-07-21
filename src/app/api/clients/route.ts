@@ -102,6 +102,18 @@ export async function POST(request: Request) {
 
     // Criar tarefa sugerida pela IA
     if (analysis.nextAction) {
+      // Definir data de vencimento baseada na prioridade
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+      tomorrow.setHours(9, 0, 0, 0) // 9h da manhã
+      
+      const dayAfterTomorrow = new Date()
+      dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2)
+      dayAfterTomorrow.setHours(9, 0, 0, 0) // 9h da manhã
+      
+      // Determinar data de vencimento baseada na prioridade
+      const dueDate = analysis.actionPriority === 'high' ? tomorrow : dayAfterTomorrow
+      
       await prisma.task.create({
         data: {
           clientId: client.id,
@@ -109,6 +121,8 @@ export async function POST(request: Request) {
           description: analysis.reasoning,
           type: 'follow-up',
           priority: analysis.actionPriority,
+          dueDate: dueDate,
+          status: 'pending',
           aiSuggested: true,
         },
       })

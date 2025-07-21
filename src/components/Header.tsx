@@ -2,14 +2,16 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, Bell, User, Menu, X } from 'lucide-react'
+import { Plus, User, Menu, X } from 'lucide-react'
+import NotificationDropdown from './NotificationDropdown'
 
 interface HeaderProps {
   onNewClient: () => void
   activeTab: string
+  onTaskClick?: (taskId: string) => void
 }
 
-export default function Header({ onNewClient, activeTab }: HeaderProps) {
+export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false)
 
   const getActiveTabTitle = () => {
@@ -65,10 +67,7 @@ export default function Header({ onNewClient, activeTab }: HeaderProps) {
 
           {/* Actions - Desktop */}
           <div className="hidden md:flex items-center space-x-4">
-            <button className="relative p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-all duration-200">
-              <Bell className="w-5 h-5" />
-              <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></span>
-            </button>
+            <NotificationDropdown onTaskClick={onTaskClick} />
             
             <button
               onClick={onNewClient}
@@ -120,9 +119,7 @@ export default function Header({ onNewClient, activeTab }: HeaderProps) {
               </button>
               
               <div className="flex justify-center space-x-4 pt-2">
-                <button className="p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-colors">
-                  <Bell className="w-5 h-5" />
-                </button>
+                <NotificationDropdown onTaskClick={onTaskClick} />
                 <button className="p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-colors">
                   <User className="w-5 h-5" />
                 </button>

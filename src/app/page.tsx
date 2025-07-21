@@ -16,6 +16,21 @@ type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search'
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
   const [showClientForm, setShowClientForm] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
+
+  const handleTaskClick = (taskId: string) => {
+    setActiveTab('tasks')
+    // Aqui poderia adicionar lógica para focar na tarefa específica
+    console.log('Clicked task:', taskId)
+  }
+
+  const handleClientCreated = () => {
+    setShowClientForm(false)
+    setRefreshKey(prev => prev + 1) // Força atualização do ClientList
+    if (activeTab !== 'clients') {
+      setActiveTab('clients') // Muda para a aba de clientes
+    }
+  }
 
   const tabs = [
     { id: 'dashboard', label: 'Dashboard', icon: Target },
@@ -30,7 +45,7 @@ export default function HomePage() {
       case 'dashboard':
         return <Dashboard />
       case 'clients':
-        return <ClientList />
+        return <ClientList key={refreshKey} />
       case 'messages':
         return <MessageGenerator />
       case 'tasks':
@@ -48,6 +63,7 @@ export default function HomePage() {
       <Header 
         onNewClient={() => setShowClientForm(true)}
         activeTab={activeTab}
+        onTaskClick={handleTaskClick}
       />
 
       {/* Modern Navigation */}
@@ -82,7 +98,10 @@ export default function HomePage() {
                   </svg>
                 </button>
               </div>
-              <ClientForm />
+              <ClientForm 
+                onSuccess={handleClientCreated}
+                onCancel={() => setShowClientForm(false)}
+              />
             </div>
           </div>
         </div>

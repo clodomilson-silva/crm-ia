@@ -42,7 +42,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
       if (onSuccess) {
         setTimeout(() => {
           onSuccess()
-        }, 1000)
+        }, 1500) // Dar tempo para mostrar a mensagem de sucesso
       }
     } catch (err) {
       console.error('Erro ao criar cliente:', err)
