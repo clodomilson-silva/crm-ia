@@ -128,11 +128,17 @@ IMPORTANTE: Data atual é ${formatDate(today)}. Use APENAS as seguintes datas pa
 - ${formatDate(tomorrow)} (amanhã - para tarefas urgentes)
 - ${formatDate(dayAfterTomorrow)} (depois de amanhã - para tarefas normais)
 
+CRITÉRIOS DE PRIORIZAÇÃO:
+- HIGH (alta): Lead Score ≥ 80, clientes "customer" com oportunidades de upsell, prospects quentes, situações urgentes
+- MEDIUM (média): Lead Score 40-79, clientes "lead" ativos, follow-ups importantes, reuniões agendadas
+- LOW (baixa): Lead Score < 40, clientes "prospect" iniciais, tarefas administrativas, envio de materiais
+
 Gere tarefas que sejam:
 1. Específicas e acionáveis
 2. Apropriadas para o relacionamento comercial
 3. Variadas (ligações, emails, reuniões, follow-ups)
 4. Com prazos realistas (use APENAS as datas fornecidas acima)
+5. Priorizadas de acordo com os critérios acima
 
 Formato de resposta (JSON):
 {
@@ -186,13 +192,26 @@ Formato de resposta (JSON):
                   taskDueDate = tomorrow
                 }
                 
+                // Validar e corrigir prioridade baseada no Lead Score se necessário
+                let taskPriority = task.priority
+                if (!taskPriority || !['high', 'medium', 'low'].includes(taskPriority)) {
+                  if (client.leadScore >= 80 || client.clientType === 'customer') {
+                    taskPriority = 'high'
+                  } else if (client.leadScore >= 40 || client.clientType === 'lead') {
+                    taskPriority = 'medium'
+                  } else {
+                    taskPriority = 'low'
+                  }
+                  console.log(`Prioridade ajustada para ${taskPriority} baseada no Lead Score ${client.leadScore} e tipo ${client.clientType}`)
+                }
+                
                 // Salvar a tarefa no banco de dados
                 const createdTask = await prisma.task.create({
                   data: {
                     title: task.title,
                     description: task.description || '',
                     type: task.type,
-                    priority: task.priority,
+                    priority: taskPriority,
                     status: 'pending',
                     dueDate: taskDueDate,
                     aiSuggested: true,
@@ -267,12 +286,19 @@ async function generateFallbackTasks(client: {
   const dayAfterTomorrow = new Date()
   dayAfterTomorrow.setDate(dayAfterTomorrow.getDate() + 2)
 
+  // Determinar prioridade baseada no Lead Score e tipo de cliente
+  const getPriority = () => {
+    if (client.leadScore >= 80 || client.clientType === 'customer') return 'high'
+    if (client.leadScore >= 40 || client.clientType === 'lead') return 'medium'
+    return 'low'
+  }
+
   const fallbackTasks = [
     {
       title: `Follow-up com ${client.name}`,
       description: `Entrar em contato para verificar interesse em nossos serviços`,
       type: 'call',
-      priority: 'medium',
+      priority: getPriority(),
       status: 'pending',
       dueDate: tomorrow,
       aiSuggested: true,
@@ -282,7 +308,7 @@ async function generateFallbackTasks(client: {
       title: `Enviar material comercial para ${client.name}`,
       description: `Preparar e enviar material comercial personalizado baseado no perfil ${client.clientType}`,
       type: 'email',
-      priority: 'medium',
+      priority: client.clientType === 'customer' ? 'high' : 'medium',
       status: 'pending',
       dueDate: dayAfterTomorrow,
       aiSuggested: true,
