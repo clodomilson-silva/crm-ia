@@ -1,6 +1,14 @@
 # 🤖 CRM com IA - Sistema Inteligente de Gestão de Clientes
 
-Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **DeepSeek**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
+Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **IA Multi-Provider**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
+
+## 🔥 **NOVIDADE**: Sistema Multi-API com Fallback Automático!
+
+Este CRM agora suporta **múltiplos provedores de IA** com fallback automático:
+- 🥇 **DeepSeek R1** (OpenRouter) - Gratuita e avançada
+- 🥈 **DeepSeek Chat** (OpenRouter) - Gratuita e confiável  
+
+➡️ **[Veja como configurar as APIs](./APIS_CONFIG.md)**
 
 ## ✨ Funcionalidades
 
@@ -12,6 +20,7 @@ Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, *
 | **📝 Gerar mensagem personalizada** | IA cria texto de e-mail, WhatsApp ou proposta comercial | ✅ |
 | **📅 Follow-up automatizado** | Agendamento de tarefas e mensagens com IA | ✅ |
 | **🔍 Pesquisa inteligente** | Busca com NLP para encontrar clientes por intenção | ✅ |
+| **🔄 Sistema Multi-API** | Fallback automático entre múltiplos provedores de IA | ✅ |
 
 ## 🚀 Como Executar
 

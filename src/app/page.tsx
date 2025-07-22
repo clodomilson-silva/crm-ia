@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Users, MessageSquare, Target, Calendar, Search } from 'lucide-react'
+import { Users, MessageSquare, Target, Calendar, Search, Activity } from 'lucide-react'
 import Header from '@/components/Header'
 import Navigation from '@/components/Navigation'
 import ClientList from '@/components/ClientList'
@@ -10,8 +10,9 @@ import MessageGenerator from '@/components/MessageGenerator'
 import TaskList from '@/components/TaskList'
 import SearchBar from '@/components/SearchBar'
 import Dashboard from '@/components/Dashboard'
+import APILimitsChecker from '@/components/APILimitsChecker'
 
-type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search'
+type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search' | 'limits'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
@@ -38,6 +39,7 @@ export default function HomePage() {
     { id: 'messages', label: 'Mensagens IA', icon: MessageSquare },
     { id: 'tasks', label: 'Tarefas', icon: Calendar },
     { id: 'search', label: 'Busca IA', icon: Search },
+    { id: 'limits', label: 'API Status', icon: Activity },
   ]
 
   const renderActiveContent = () => {
@@ -52,6 +54,8 @@ export default function HomePage() {
         return <TaskList />
       case 'search':
         return <SearchBar />
+      case 'limits':
+        return <APILimitsChecker />
       default:
         return <Dashboard />
     }

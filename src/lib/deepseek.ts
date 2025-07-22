@@ -1,8 +1,107 @@
 import { ClientSearchData } from '@/types/crm'
 
-// Configuração da API OpenRouter (DeepSeek gratuita)
-const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
-const DEEPSEEK_MODEL = 'deepseek/deepseek-chat' // Modelo gratuito no OpenRouter
+// Configurações das APIs com fallback
+const API_CONFIGS = {
+  kimi: {
+    name: 'DeepSeek R1 (OpenRouter)',
+    url: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'deepseek/deepseek-r1',
+    apiKey: process.env.KIMI_API_KEY,
+    headers: {
+      'HTTP-Referer': 'http://localhost:3000',
+      'X-Title': 'CRM com IA'
+    }
+  },
+  tng: {
+    name: 'DeepSeek Chat (OpenRouter)',
+    url: 'https://openrouter.ai/api/v1/chat/completions',
+    model: 'deepseek/deepseek-chat',
+    apiKey: process.env.OPENROUTER_TNG_API_KEY,
+    headers: {
+      'HTTP-Referer': 'http://localhost:3000',
+      'X-Title': 'CRM com IA'
+    }
+  }
+}
+
+// Função para verificar limites e créditos de uma API key da OpenRouter
+async function checkOpenRouterLimits(apiKey: string, apiName: string): Promise<void> {
+  if (!apiKey || apiKey.length === 0) {
+    console.log(`⏭️  ${apiName}: API key não configurada`)
+    return
+  }
+
+  try {
+    console.log(`🔍 Verificando limites para ${apiName}...`)
+    
+    const response = await fetch('https://openrouter.ai/api/v1/auth/key', {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    })
+
+    if (!response.ok) {
+      console.log(`❌ ${apiName}: Erro ${response.status} ao verificar limites`)
+      return
+    }
+
+    const data = await response.json()
+    
+    // Exibir informações da chave
+    console.log(`\n📊 === ${apiName} === `)
+    console.log(`🔑 Chave: ${apiKey.substring(0, 12)}...`)
+    
+    if (data.data) {
+      const keyInfo = data.data
+      console.log(`💰 Créditos: $${keyInfo.usage || 0} usado de $${keyInfo.limit || 'ilimitado'}`)
+      console.log(`🆓 Tier gratuito: ${keyInfo.is_free_tier ? 'Sim' : 'Não'}`)
+      
+      if (keyInfo.rate_limit) {
+        console.log(`⚡ Rate limit: ${keyInfo.rate_limit.requests} req/${keyInfo.rate_limit.interval}`)
+      }
+      
+      // Calcular porcentagem de uso
+      if (keyInfo.limit && keyInfo.usage) {
+        const usage = Number(keyInfo.usage)
+        const limit = Number(keyInfo.limit)
+        const percentage = ((usage / limit) * 100).toFixed(1)
+        const percentageNum = Number(percentage)
+        const status = percentageNum > 90 ? '🔴' : percentageNum > 70 ? '🟡' : '🟢'
+        console.log(`📈 Uso: ${percentage}% ${status}`)
+      }
+    }
+    
+    console.log(`✅ ${apiName}: Verificação concluída\n`)
+    
+  } catch (error) {
+    console.log(`💥 ${apiName}: Erro ao verificar limites - ${error}`)
+  }
+}
+
+// Função para verificar limites de todas as APIs configuradas
+export async function checkAllAPILimits(): Promise<void> {
+  console.log('\n🚀 === VERIFICAÇÃO DE LIMITES DAS APIs ===')
+  console.log('📅 Data:', new Date().toLocaleString('pt-BR'))
+  console.log('=' .repeat(50))
+  
+  const apis = [
+    { key: process.env.KIMI_API_KEY, name: 'API Principal (DeepSeek R1)' },
+    { key: process.env.OPENROUTER_TNG_API_KEY, name: 'API Secundária (DeepSeek Chat)' }
+  ]
+  
+  for (const api of apis) {
+    if (api.key) {
+      await checkOpenRouterLimits(api.key, api.name)
+    } else {
+      console.log(`⏭️  ${api.name}: Não configurada`)
+    }
+  }
+  
+  console.log('=' .repeat(50))
+  console.log('🎯 Verificação completa! Sistema pronto para uso.\n')
+}
 
 export interface AIAnalysis {
   leadScore: number
@@ -11,12 +110,34 @@ export interface AIAnalysis {
   reasoning: string
 }
 
-// Função para verificar se a API key está configurada
+// Função para verificar se pelo menos uma API está configurada
+export function isAnyAIConfigured(): boolean {
+  const configs = Object.values(API_CONFIGS)
+  const availableAPIs = configs.filter(config => config.apiKey && config.apiKey.length > 0)
+  
+  console.log('🔍 Verificando APIs disponíveis:')
+  configs.forEach(config => {
+    const status = config.apiKey ? '✅ Configurada' : '❌ Não configurada'
+    console.log(`  ${config.name}: ${status}`)
+  })
+  
+  if (availableAPIs.length === 0) {
+    console.log('⚠️  Nenhuma API configurada. Usando fallback.')
+    return false
+  }
+  
+  console.log(`✅ ${availableAPIs.length} API(s) disponível(is) para uso`)
+  return true
+}
+
+// Função para verificar se a API key está configurada e funcionando
+export function isAIConfigured(): boolean {
+  return isAnyAIConfigured()
+}
+
+// Função para verificar se pelo menos uma API está configurada (mantendo compatibilidade)
 export function isDeepSeekConfigured(): boolean {
-  const apiKey = process.env.DEEPSEEK_API_KEY
-  console.log('API Key check:', apiKey ? `${apiKey.substring(0, 10)}...` : 'Not found')
-  // Temporariamente retornar false para usar fallback até resolver API key
-  return false
+  return isAnyAIConfigured()
 }
 
 // Função para limpar resposta da IA e extrair JSON válido
@@ -43,40 +164,62 @@ function cleanAIResponse(response: string): string {
   return cleaned
 }
 
-// Função auxiliar para fazer requisições à API OpenRouter
-async function callDeepSeekAPI(messages: Array<{role: string, content: string}>, temperature = 0.7): Promise<string> {
-  if (!isDeepSeekConfigured()) {
-    throw new Error('API DeepSeek não configurada')
-  }
-
-  console.log('Making API call to OpenRouter...')
+// Função auxiliar para fazer requisições com fallback múltiplo
+async function callAIWithFallback(messages: Array<{role: string, content: string}>, temperature = 0.7): Promise<{response: string, provider: string}> {
+  const apiOrder = ['kimi', 'tng'] as const
   
-  const response = await fetch(OPENROUTER_API_URL, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${process.env.DEEPSEEK_API_KEY}`,
-      'HTTP-Referer': 'http://localhost:3000',
-      'X-Title': 'CRM com IA',
-    },
-    body: JSON.stringify({
-      model: DEEPSEEK_MODEL,
-      messages,
-      temperature,
-      max_tokens: 1000,
-    }),
-  })
+  for (const apiName of apiOrder) {
+    const config = API_CONFIGS[apiName]
+    
+    if (!config.apiKey || config.apiKey.length === 0) {
+      console.log(`⏭️  Pulando ${config.name} - API key não configurada`)
+      continue
+    }
+    
+    try {
+      console.log(`🔄 Tentando ${config.name}...`)
+      
+      const response = await fetch(config.url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${config.apiKey}`,
+          ...config.headers
+        },
+        body: JSON.stringify({
+          model: config.model,
+          messages,
+          temperature,
+          max_tokens: 1000,
+        }),
+      })
 
-  console.log('Response status:', response.status)
+      console.log(`📡 ${config.name} - Status: ${response.status}`)
 
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}))
-    console.error('API Error:', errorData)
-    throw new Error(`OpenRouter API Error: ${response.status} - ${errorData.error?.message || 'Unknown error'}`)
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        console.error(`❌ ${config.name} falhou:`, errorData)
+        continue // Tenta próxima API
+      }
+
+      const data = await response.json()
+      const content = data.choices?.[0]?.message?.content || ''
+      
+      if (content) {
+        console.log(`✅ ${config.name} - Sucesso!`)
+        return { response: content, provider: config.name }
+      }
+      
+      console.log(`⚠️  ${config.name} - Resposta vazia`)
+      continue
+      
+    } catch (error) {
+      console.error(`💥 ${config.name} - Erro de conexão:`, error)
+      continue // Tenta próxima API
+    }
   }
-
-  const data = await response.json()
-  return data.choices?.[0]?.message?.content || ''
+  
+  throw new Error('Todas as APIs falharam')
 }
 
 export async function analyzeClient(clientData: {
@@ -87,13 +230,13 @@ export async function analyzeClient(clientData: {
   interactionHistory?: string[]
 }): Promise<AIAnalysis> {
   // Verificar se a API está configurada
-  if (!isDeepSeekConfigured()) {
-    console.warn('⚠️  API DeepSeek (OpenRouter) não configurada. Configure DEEPSEEK_API_KEY no arquivo .env.local')
+  if (!isAnyAIConfigured()) {
+    console.warn('⚠️  Nenhuma API de IA configurada. Configure pelo menos uma chave no arquivo .env.local')
     return {
       leadScore: 50,
-      nextAction: 'Configurar API DeepSeek via OpenRouter para análise automática',
+      nextAction: 'Configurar API de IA (DeepSeek, Groq ou OpenAI) para análise automática',
       actionPriority: 'medium',
-      reasoning: 'API DeepSeek não configurada - usando valores padrão'
+      reasoning: 'Nenhuma API de IA configurada - usando valores padrão'
     }
   }
 
@@ -117,14 +260,15 @@ IMPORTANTE: Responda APENAS com um JSON válido, sem formatação markdown, sem 
 `
 
   try {
-    const response = await callDeepSeekAPI([
+    const result = await callAIWithFallback([
       { role: 'user', content: prompt }
     ], 0.7)
 
-    if (!response) throw new Error('Resposta vazia da IA')
+    if (!result.response) throw new Error('Resposta vazia da IA')
 
+    console.log(`🤖 Análise gerada por: ${result.provider}`)
     // Limpar resposta removendo markdown e formatação extra
-    const cleanResponse = cleanAIResponse(response)
+    const cleanResponse = cleanAIResponse(result.response)
     
     return JSON.parse(cleanResponse) as AIAnalysis
   } catch (error: unknown) {
@@ -154,8 +298,8 @@ export async function generateMessage(
   tone: 'formal' | 'casual' | 'friendly' = 'friendly'
 ): Promise<string> {
   // Verificar se a API está configurada
-  if (!isDeepSeekConfigured()) {
-    return 'Para usar o gerador de mensagens com IA, configure sua chave da API DeepSeek (OpenRouter) no arquivo .env.local'
+  if (!isAnyAIConfigured()) {
+    return '🤖 **Sistema de Fallback Ativo**\n\n' + getFallbackMessage(messageType, clientName)
   }
 
   const toneInstructions = {
@@ -182,11 +326,12 @@ Responda apenas com o texto da mensagem, sem aspas ou formatação adicional.
 `
 
   try {
-    const response = await callDeepSeekAPI([
+    const result = await callAIWithFallback([
       { role: 'user', content: prompt }
     ], 0.8)
 
-    return response || getFallbackMessage(messageType, clientName)
+    console.log(`🤖 Mensagem gerada por: ${result.provider}`)
+    return result.response || getFallbackMessage(messageType, clientName)
   } catch (error) {
     console.error('Erro ao gerar mensagem:', error)
     return getFallbackMessage(messageType, clientName)
@@ -293,8 +438,8 @@ export async function searchClients(query: string, clients: ClientSearchData[]):
   if (!query || clients.length === 0) return clients
 
   // Verificar se a API está configurada
-  if (!isDeepSeekConfigured()) {
-    console.warn('⚠️  API DeepSeek (OpenRouter) não configurada. Usando busca simples.')
+  if (!isAnyAIConfigured()) {
+    console.warn('⚠️  Nenhuma API de IA configurada. Usando busca simples.')
     // Fallback para busca simples
     return clients.filter(c => 
       c.name.toLowerCase().includes(query.toLowerCase()) ||
@@ -317,14 +462,15 @@ Se nenhum cliente for relevante, retorne: []
 `
 
   try {
-    const response = await callDeepSeekAPI([
+    const result = await callAIWithFallback([
       { role: 'user', content: prompt }
     ], 0.3)
 
-    if (!response) return clients
+    if (!result.response) return clients
 
+    console.log(`🤖 Busca inteligente por: ${result.provider}`)
     // Limpar resposta removendo markdown e formatação extra
-    const cleanResponse = cleanAIResponse(response)
+    const cleanResponse = cleanAIResponse(result.response)
 
     const relevantIds = JSON.parse(cleanResponse) as string[]
     return clients.filter(c => relevantIds.includes(c.id))
