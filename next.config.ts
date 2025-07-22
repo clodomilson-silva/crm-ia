@@ -15,9 +15,9 @@ const nextConfig: NextConfig = {
     optimizePackageImports: ['lucide-react', 'axios'],
   },
   
-  // Configurações de desenvolvimento
+  // Configurações de desenvolvimento - permite acesso externo
   ...(process.env.NODE_ENV === 'development' && {
-    // Adiciona configurações específicas de desenvolvimento se necessário
+    assetPrefix: '',
   }),
 };
 

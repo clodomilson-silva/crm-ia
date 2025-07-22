@@ -34,43 +34,54 @@ async function checkOpenRouterLimits(apiKey: string, apiName: string): Promise<v
   try {
     console.log(`🔍 Verificando limites para ${apiName}...`)
     
-    const response = await fetch('https://openrouter.ai/api/v1/auth/key', {
+    // Testar a API key fazendo uma chamada simples para verificar se está funcionando
+    const testResponse = await fetch('https://openrouter.ai/api/v1/models', {
       method: 'GET',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/json',
+        'HTTP-Referer': 'http://localhost:3000',
+        'X-Title': 'CRM com IA'
       }
     })
 
-    if (!response.ok) {
-      console.log(`❌ ${apiName}: Erro ${response.status} ao verificar limites`)
+    if (!testResponse.ok) {
+      console.log(`❌ ${apiName}: Erro ${testResponse.status} - Chave inválida ou sem permissão`)
       return
     }
 
-    const data = await response.json()
-    
-    // Exibir informações da chave
+    // Se chegou até aqui, a chave está funcionando
     console.log(`\n📊 === ${apiName} === `)
     console.log(`🔑 Chave: ${apiKey.substring(0, 12)}...`)
+    console.log(`✅ Chave válida e funcional`)
+    console.log(`🔄 API pronta para uso`)
     
-    if (data.data) {
-      const keyInfo = data.data
-      console.log(`💰 Créditos: $${keyInfo.usage || 0} usado de $${keyInfo.limit || 'ilimitado'}`)
-      console.log(`🆓 Tier gratuito: ${keyInfo.is_free_tier ? 'Sim' : 'Não'}`)
+    // Tentar obter informações detalhadas (opcional)
+    try {
+      const authResponse = await fetch('https://openrouter.ai/api/v1/auth/key', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${apiKey}`,
+          'Content-Type': 'application/json',
+          'HTTP-Referer': 'http://localhost:3000',
+          'X-Title': 'CRM com IA'
+        }
+      })
       
-      if (keyInfo.rate_limit) {
-        console.log(`⚡ Rate limit: ${keyInfo.rate_limit.requests} req/${keyInfo.rate_limit.interval}`)
+      if (authResponse.ok) {
+        const authData = await authResponse.json()
+        if (authData.data) {
+          const keyInfo = authData.data
+          console.log(`� Créditos: $${keyInfo.usage || 0} usado de $${keyInfo.limit || 'ilimitado'}`)
+          console.log(`🆓 Tier gratuito: ${keyInfo.is_free_tier ? 'Sim' : 'Não'}`)
+          
+          if (keyInfo.rate_limit) {
+            console.log(`⚡ Rate limit: ${keyInfo.rate_limit.requests} req/${keyInfo.rate_limit.interval}`)
+          }
+        }
       }
-      
-      // Calcular porcentagem de uso
-      if (keyInfo.limit && keyInfo.usage) {
-        const usage = Number(keyInfo.usage)
-        const limit = Number(keyInfo.limit)
-        const percentage = ((usage / limit) * 100).toFixed(1)
-        const percentageNum = Number(percentage)
-        const status = percentageNum > 90 ? '🔴' : percentageNum > 70 ? '🟡' : '🟢'
-        console.log(`📈 Uso: ${percentage}% ${status}`)
-      }
+    } catch {
+      console.log(`ℹ️  Informações detalhadas não disponíveis`)
     }
     
     console.log(`✅ ${apiName}: Verificação concluída\n`)
