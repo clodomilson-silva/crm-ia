@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import HydrationFix from "@/components/HydrationFix";
 import "@/lib/suppressWarnings";
 
 const geistSans = Geist({
@@ -37,7 +36,6 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased bg-gradient-to-br from-gray-50 to-blue-50/30 min-h-screen`}
         suppressHydrationWarning={true}
       >
-        <HydrationFix />
         {children}
       </body>
     </html>

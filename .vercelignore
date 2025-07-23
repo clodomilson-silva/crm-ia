@@ -15,3 +15,6 @@ DEPLOY-READY.md
 QUICK-DEPLOY.md
 test-*.js
 check-limits-startup.js
+
+# Não ignorar .env.production (necessário para deploy)
+!.env.production
