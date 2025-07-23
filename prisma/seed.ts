@@ -5,10 +5,16 @@ const prisma = new PrismaClient()
 async function main() {
   console.log('🌱 Populando banco de dados com dados de exemplo...')
 
-  // Limpar dados existentes
-  await prisma.task.deleteMany()
-  await prisma.interaction.deleteMany()
-  await prisma.client.deleteMany()
+  // Verificar se já existem dados para não sobrescrever
+  const existingClients = await prisma.client.count()
+  
+  if (existingClients > 0) {
+    console.log(`⚠️  Banco já contém ${existingClients} clientes. Pulando seed para preservar dados existentes.`)
+    console.log('💡 Para forçar reset, use: npm run db:reset')
+    return
+  }
+
+  console.log('✅ Banco vazio, criando dados de exemplo...')
 
   // Clientes de exemplo
   const clients = await Promise.all([
