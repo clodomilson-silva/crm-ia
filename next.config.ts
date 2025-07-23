@@ -7,9 +7,6 @@ const nextConfig: NextConfig = {
   // Configurações de performance
   poweredByHeader: false,
   
-  // Configurações para produção na Vercel
-  output: 'standalone',
-  
   // Otimizações para build
   experimental: {
     optimizePackageImports: ['lucide-react', 'axios'],
