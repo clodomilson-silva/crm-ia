@@ -1,0 +1,17 @@
+# Ignorar arquivos desnecessários no deploy
+.env.local
+.env.example
+*.log
+.DS_Store
+node_modules
+.git
+prisma/dev.db
+backup_sqlite.sql
+TESTE_FUNCIONALIDADES.md
+APIS_CONFIG.md
+DEEPSEEK_SETUP.md
+DEPLOY.md
+DEPLOY-READY.md
+QUICK-DEPLOY.md
+test-*.js
+check-limits-startup.js
