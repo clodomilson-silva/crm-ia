@@ -11,6 +11,22 @@ interface ClientDetailModalProps {
 export default function ClientDetailModal({ client, isOpen, onClose }: ClientDetailModalProps) {
   if (!isOpen || !client) return null
 
+  // Validação defensiva APENAS para undefined/null, preservando dados reais
+  console.log('🔍 Cliente original no modal:', client)
+  
+  // Usa nullish coalescing (??) para preservar valores 0, '', false válidos
+  const safeClient = {
+    ...client,
+    name: client.name ?? 'Nome não disponível',
+    email: client.email ?? 'Email não disponível', 
+    clientType: client.clientType ?? 'prospect',
+    leadScore: client.leadScore ?? 0,
+    tasks: client.tasks ?? [],
+    interactions: client.interactions ?? [],
+  }
+  
+  console.log('✅ Cliente processado no modal:', safeClient)
+
   const formatDate = (date: string | Date) => {
     const dateObj = typeof date === 'string' ? new Date(date) : date
     return dateObj.toLocaleDateString('pt-BR', {
@@ -71,18 +87,18 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
           <div className="flex items-center space-x-4">
             <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
               <span className="text-white font-semibold text-lg">
-                {client.name.charAt(0).toUpperCase()}
+                {safeClient.name ? safeClient.name.charAt(0).toUpperCase() : '?'}
               </span>
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">{client.name}</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{safeClient.name}</h2>
               <div className="flex items-center space-x-2 mt-1">
-                <span className={`px-2 py-1 text-xs rounded-full ${getClientTypeColor(client.clientType)}`}>
-                  {getClientTypeLabel(client.clientType)}
+                <span className={`px-2 py-1 text-xs rounded-full ${getClientTypeColor(safeClient.clientType)}`}>
+                  {getClientTypeLabel(safeClient.clientType)}
                 </span>
-                <span className={`px-2 py-1 text-xs rounded-full font-semibold ${getLeadScoreColor(client.leadScore)}`}>
+                <span className={`px-2 py-1 text-xs rounded-full font-semibold ${getLeadScoreColor(safeClient.leadScore)}`}>
                   <Star className="w-3 h-3 inline mr-1" />
-                  {client.leadScore}% Lead Score
+                  {safeClient.leadScore}% Lead Score
                 </span>
               </div>
             </div>
@@ -109,16 +125,16 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
                   <Mail className="w-5 h-5 text-gray-400" />
                   <div>
                     <p className="text-sm text-gray-500">Email</p>
-                    <p className="font-medium">{client.email}</p>
+                    <p className="font-medium">{safeClient.email}</p>
                   </div>
                 </div>
 
-                {client.phone && (
+                {safeClient.phone && (
                   <div className="flex items-center space-x-3">
                     <Phone className="w-5 h-5 text-gray-400" />
                     <div>
                       <p className="text-sm text-gray-500">Telefone</p>
-                      <p className="font-medium">{client.phone}</p>
+                      <p className="font-medium">{safeClient.phone}</p>
                     </div>
                   </div>
                 )}
@@ -127,17 +143,17 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
                   <Calendar className="w-5 h-5 text-gray-400" />
                   <div>
                     <p className="text-sm text-gray-500">Cadastrado em</p>
-                    <p className="font-medium">{formatDate(client.createdAt)}</p>
+                    <p className="font-medium">{safeClient.createdAt ? formatDate(safeClient.createdAt) : 'Data não disponível'}</p>
                   </div>
                 </div>
               </div>
 
               {/* Notas */}
-              {client.notes && (
+              {safeClient.notes && (
                 <div className="mt-6">
                   <h4 className="text-md font-semibold text-gray-900 mb-2">Notas</h4>
                   <div className="bg-gray-50 p-4 rounded-lg">
-                    <p className="text-gray-700 whitespace-pre-wrap">{client.notes}</p>
+                    <p className="text-gray-700 whitespace-pre-wrap">{safeClient.notes}</p>
                   </div>
                 </div>
               )}
@@ -146,12 +162,12 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
             {/* Tarefas */}
             <div className="space-y-4">
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2">
-                Tarefas ({client.tasks?.length || 0})
+                Tarefas ({safeClient.tasks?.length || 0})
               </h3>
 
-              {client.tasks && client.tasks.length > 0 ? (
+              {safeClient.tasks && safeClient.tasks.length > 0 ? (
                 <div className="space-y-3 max-h-64 overflow-y-auto">
-                  {client.tasks.map((task) => (
+                  {safeClient.tasks.map((task) => (
                     <div
                       key={task.id}
                       className="border rounded-lg p-4 hover:bg-gray-50"
@@ -190,14 +206,14 @@ export default function ClientDetailModal({ client, isOpen, onClose }: ClientDet
           </div>
 
           {/* Interações */}
-          {client.interactions && client.interactions.length > 0 && (
+          {safeClient.interactions && safeClient.interactions.length > 0 && (
             <div className="mt-8">
               <h3 className="text-lg font-semibold text-gray-900 border-b pb-2 mb-4">
-                Histórico de Interações ({client.interactions.length})
+                Histórico de Interações ({safeClient.interactions.length})
               </h3>
               
               <div className="space-y-3 max-h-64 overflow-y-auto">
-                {client.interactions.map((interaction) => (
+                {safeClient.interactions.map((interaction) => (
                   <div
                     key={interaction.id}
                     className="border rounded-lg p-4 hover:bg-gray-50"

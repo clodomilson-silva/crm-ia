@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { Users, TrendingUp, Clock, Star, BarChart3 } from 'lucide-react'
+import ClientOnly from './ClientOnly'
 import axios from 'axios'
 
 interface DashboardStats {
@@ -30,7 +31,7 @@ interface TaskData {
   }
 }
 
-export default function Dashboard() {
+function DashboardContent() {
   const [stats, setStats] = useState<DashboardStats>({
     totalClients: 0,
     prospects: 0,
@@ -49,13 +50,28 @@ export default function Dashboard() {
 
   const loadDashboardData = async () => {
     try {
+      console.log('Iniciando carregamento do dashboard...')
+      
       const [clientsRes, tasksRes] = await Promise.all([
-        axios.get('/api/clients'),
-        axios.get('/api/tasks?status=pending'),
+        axios.get('/api/clients').catch(err => {
+          console.error('Erro ao buscar clientes:', err)
+          return { data: { clients: [] } }
+        }),
+        axios.get('/api/tasks?status=pending').catch(err => {
+          console.error('Erro ao buscar tarefas:', err)
+          return { data: { tasks: [] } }
+        }),
       ])
 
-      const clients: ClientData[] = clientsRes.data.clients
-      const tasks: TaskData[] = tasksRes.data.tasks
+      console.log('Resposta clientes:', clientsRes.data)
+      console.log('Resposta tarefas:', tasksRes.data)
+
+      // Extrair dados corretamente das respostas da API
+      const clients: ClientData[] = clientsRes.data.clients || []
+      const tasks: TaskData[] = tasksRes.data.tasks || tasksRes.data || []
+
+      console.log('Clientes processados:', clients.length)
+      console.log('Tarefas processadas:', tasks.length)
 
       // Calcular estatísticas
       const totalClients = clients.length
@@ -84,6 +100,8 @@ export default function Dashboard() {
         .sort((a, b) => new Date(a.dueDate).getTime() - new Date(b.dueDate).getTime())
         .slice(0, 3)
       setUrgentTasks(sortedTasks)
+
+      console.log('Dashboard carregado com sucesso')
 
     } catch (error) {
       console.error('Erro ao carregar dados do dashboard:', error)
@@ -293,5 +311,17 @@ export default function Dashboard() {
         </div>
       </div>
     </div>
+  )
+}
+
+export default function Dashboard() {
+  return (
+    <ClientOnly fallback={
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <DashboardContent />
+    </ClientOnly>
   )
 }

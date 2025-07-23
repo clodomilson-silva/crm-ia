@@ -4,13 +4,14 @@ import { useState } from 'react'
 import { Users, MessageSquare, Target, Calendar, Search, Activity } from 'lucide-react'
 import Header from '@/components/Header'
 import Navigation from '@/components/Navigation'
-import ClientList from '@/components/ClientList'
+import ClientList from '@/components/ClientListModern'
 import ClientForm from '@/components/ClientForm'
 import MessageGenerator from '@/components/MessageGenerator'
 import TaskList from '@/components/TaskList'
 import SearchBar from '@/components/SearchBar'
 import Dashboard from '@/components/Dashboard'
 import APILimitsChecker from '@/components/APILimitsChecker'
+import RealtimeNotifications from '@/components/RealtimeNotifications'
 
 type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search' | 'limits'
 
@@ -85,6 +86,9 @@ export default function HomePage() {
           </div>
         </div>
       </main>
+
+      {/* Real-time Notifications */}
+      <RealtimeNotifications />
 
       {/* Modal for New Client */}
       {showClientForm && (

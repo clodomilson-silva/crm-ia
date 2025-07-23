@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import type { NextRequest } from 'next/server'
 
 // Middleware temporariamente desabilitado para debug
-export function middleware(_request: NextRequest) {
+export function middleware() {
   // Simplesmente passar todas as requisições sem processamento
   return NextResponse.next()
 }

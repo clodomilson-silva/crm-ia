@@ -44,17 +44,30 @@ export default function NotificationDropdown({ onTaskClick }: NotificationDropdo
     try {
       setLoading(true)
       const response = await axios.get('/api/notifications')
-      if (response.data.success) {
-        setNotifications(response.data.notifications || [])
-        setStats(response.data.stats || {
-          totalOverdue: 0,
-          highPriorityOverdue: 0,
-          todayPending: 0,
-          totalNotifications: 0
-        })
+      
+      // Garantir que sempre temos uma estrutura válida
+      const data = response.data || {}
+      const notifications = data.notifications || []
+      const stats = data.stats || {
+        totalOverdue: 0,
+        highPriorityOverdue: 0,
+        todayPending: 0,
+        totalNotifications: 0
       }
+      
+      setNotifications(notifications)
+      setStats(stats)
+      
     } catch (error) {
       console.error('Erro ao carregar notificações:', error)
+      // Em caso de erro, definir valores padrão
+      setNotifications([])
+      setStats({
+        totalOverdue: 0,
+        highPriorityOverdue: 0,
+        todayPending: 0,
+        totalNotifications: 0
+      })
     } finally {
       setLoading(false)
     }

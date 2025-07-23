@@ -1,8 +1,8 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Configurações para melhor desenvolvimento
-  reactStrictMode: true,
+  // Temporarily disable strict mode to fix hydration issues
+  reactStrictMode: false,
   
   // Configurações de performance
   poweredByHeader: false,

@@ -4,12 +4,13 @@ import { useState, useEffect } from 'react'
 import { Search, Filter, Mail, Phone, User, TrendingUp } from 'lucide-react'
 import ClientDetailModal from './ClientDetailModal'
 import TaskForm from './TaskForm'
+import ClientOnly from './ClientOnly'
 import { ClientWithRelations } from '@/types/crm'
 import { useClients, useClient } from '@/hooks/useCRMData'
 import { useFilters } from '@/contexts/CRMContext'
 import { useWebSocket } from '@/hooks/useWebSocket'
 
-export default function ClientList() {
+function ClientListContent() {
   const [selectedClient, setSelectedClient] = useState<ClientWithRelations | null>(null)
   const [showTaskForm, setShowTaskForm] = useState(false)
   const [taskClientId, setTaskClientId] = useState<string>('')
@@ -21,10 +22,13 @@ export default function ClientList() {
   
   // Use custom hooks for data fetching
   const { 
-    data: clients, 
+    data: clients = [], 
     isLoading: loadingClients, 
     mutate: refreshClients 
   } = useClients()
+
+  // Ensure clients is always an array
+  const safeClients = Array.isArray(clients) ? clients : []
 
   // Use hook for individual client details
   const { 
@@ -32,8 +36,8 @@ export default function ClientList() {
     isLoading: loadingDetails 
   } = useClient(selectedClientId || undefined)
 
-  // WebSocket for real-time updates (unused for now)
-  const { } = useWebSocket()
+  // WebSocket for real-time updates
+  const { notifyTaskCreated } = useWebSocket()
 
   const handleViewDetails = (clientId: string) => {
     setSelectedClientId(clientId)
@@ -43,8 +47,8 @@ export default function ClientList() {
   // Update selectedClient when clientDetails loads
   useEffect(() => {
     if (clientDetails && !loadingDetails) {
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      setSelectedClient(clientDetails as any)
+      console.log('📋 Dados do cliente carregados na lista:', clientDetails)
+      setSelectedClient(clientDetails as ClientWithRelations)
     }
   }, [clientDetails, loadingDetails])
 
@@ -57,7 +61,13 @@ export default function ClientList() {
   const handleTaskCreated = () => {
     // Refresh clients to update task counts
     refreshClients()
-    // Simply refresh without WebSocket notification for now
+    // Notify other users via WebSocket
+    notifyTaskCreated({
+      id: 'temp',
+      title: 'Nova tarefa criada',
+      clientId: taskClientId,
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } as any)
   }
 
   const getScoreColor = (score: number) => {
@@ -140,7 +150,7 @@ export default function ClientList() {
 
       {/* Lista de Clientes */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
-        {clients.length === 0 ? (
+        {safeClients.length === 0 ? (
           <div className="text-center py-12">
             <Filter className="w-12 h-12 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500">
@@ -153,7 +163,7 @@ export default function ClientList() {
         ) : (
           <div className="divide-y divide-gray-200">
             {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-            {clients.map((client: any) => (
+            {safeClients.map((client: any) => (
               <div key={client.id} className="p-3 sm:p-4 lg:p-6 hover:bg-gray-50 transition-colors">
                 <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-3 lg:space-y-0">
                   <div className="flex-1 min-w-0">
@@ -191,7 +201,7 @@ export default function ClientList() {
                       <span className="flex items-center">
                         📋
                         {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
-                        {client.tasks.filter((task: any) => task.status === 'pending').length} pendentes
+                        {client.tasks.filter((t: any) => t.status === 'pending').length} pendentes
                       </span>
                     </div>
                   </div>
@@ -241,5 +251,17 @@ export default function ClientList() {
         />
       )}
     </div>
+  )
+}
+
+export default function ClientList() {
+  return (
+    <ClientOnly fallback={
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+      </div>
+    }>
+      <ClientListContent />
+    </ClientOnly>
   )
 }

@@ -27,9 +27,12 @@ export default function MessageGenerator() {
   const loadClients = async () => {
     try {
       const response = await axios.get('/api/clients')
-      setClients(response.data.clients)
+      // Extrair clientes corretamente da resposta da API
+      const clientsData = response.data.clients || []
+      setClients(clientsData)
     } catch (error) {
       console.error('Erro ao carregar clientes:', error)
+      setClients([])
     }
   }
 
