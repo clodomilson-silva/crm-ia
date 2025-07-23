@@ -82,7 +82,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           name="name"
           value={formData.name}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
           placeholder="Nome completo do cliente"
           required
         />
@@ -97,7 +97,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           name="email"
           value={formData.email}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
           placeholder="email@exemplo.com"
           required
         />
@@ -112,7 +112,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           name="phone"
           value={formData.phone}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
           placeholder="(11) 99999-9999"
         />
       </div>
@@ -125,7 +125,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           name="clientType"
           value={formData.clientType}
           onChange={handleChange}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent"
         >
           <option value="prospect">Prospect</option>
           <option value="lead">Lead</option>
@@ -143,16 +143,16 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           value={formData.notes}
           onChange={handleChange}
           rows={3}
-          className="w-full border border-gray-300 rounded-lg px-3 py-2 text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
+          className="w-full border border-gray-300 rounded-lg px-3 py-3 sm:py-2 text-base text-gray-900 bg-white focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500"
           placeholder="Informações adicionais sobre o cliente..."
         />
       </div>
 
-      <div className="flex gap-3 pt-4">
+      <div className="flex flex-col sm:flex-row gap-3 pt-4">
         <button
           type="submit"
           disabled={loading}
-          className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 bg-blue-600 text-white py-3 sm:py-2 px-4 rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors font-medium text-sm sm:text-base"
         >
           {loading ? 'Criando...' : 'Criar Cliente'}
         </button>
@@ -161,7 +161,7 @@ export default function ClientForm({ onSuccess, onCancel }: Props) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-3 sm:py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors font-medium text-sm sm:text-base"
           >
             Cancelar
           </button>
