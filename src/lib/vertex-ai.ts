@@ -1,8 +1,12 @@
 import { ClientSearchData } from '@/types/crm'
 
 // Configuração do Google Generative AI (aceita API Key direta)
-const API_KEY = process.env.GOOGLE_AI_API_KEY || 'AIzaSyBf1GJuNXCejk7iIn3GLQHscyh2vISpxRk'
+const API_KEY = process.env.GOOGLE_AI_API_KEY
 const MODEL = 'gemini-1.5-flash'
+
+if (!API_KEY) {
+  throw new Error('GOOGLE_AI_API_KEY não configurada nas variáveis de ambiente')
+}
 
 console.log('🔧 Google Generative AI configurado:', {
   hasApiKey: !!API_KEY,
