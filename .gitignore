@@ -41,8 +41,16 @@ yarn-error.log*
 # Documentação de configuração e testes (sensível)
 DEEPSEEK_SETUP.md
 TESTE_FUNCIONALIDADES.md
+GOOGLE_AI_SETUP.md
+DEPLOY.md
+DEPLOY-READY.md
+QUICK-DEPLOY.md
+APIS_CONFIG.md
+MELHORIAS_ESTADO.md
+LIMPEZA_RESUMO.md
 *_SETUP.md
 *_TEST*.md
+*_RESUMO.md
 
 # Database
 *.db
@@ -128,6 +136,18 @@ next-env.d.ts
 # API Keys e configurações sensíveis
 config/keys.js
 config/prod.js
+
+# Scripts de teste e verificação (contém chaves)
+test-*.js
+check-*.js
+list-models.js
+generate-*.js
+cleanup.ps1
+
+# Arquivos de configuração específicos do ambiente
+.env.google-cloud
+.env.production
+vercel.json
 
 # Backup files
 *.bak

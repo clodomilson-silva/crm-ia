@@ -9,8 +9,6 @@ Este CRM agora utiliza **Google Generative AI (Gemini)** como provedor único de
 - 🔑 **API Key Simples** - Configuração direta sem OAuth2  
 - 🌐 **Endpoint Direto** - `generativelanguage.googleapis.com`
 
-➡️ **API Key configurada:** `AIzaSyBf1GJuNXCejk7iIn3GLQHscyh2vISpxRk`
-
 ## ✨ Funcionalidades
 
 | 📋 Recurso | 📝 Descrição | 🤖 IA Envolvida? |
@@ -48,12 +46,17 @@ npm run db:seed
 
 ### 3. Configure a API do Google
 
-A API Key já está configurada no sistema. Para verificar o status:
+Edite o arquivo `.env.local` e adicione sua chave da Google AI:
 
-```bash
-# Testar configuração
-curl http://localhost:3000/api/test-env
+```env
+GOOGLE_AI_API_KEY=sua-chave-google-ai-aqui
 ```
+
+> 💡 **Como obter a API Key:**
+> 1. Acesse [Google AI Studio](https://aistudio.google.com/)
+> 2. Faça login com sua conta Google
+> 3. Clique em "Get API Key"
+> 4. Copie a chave gerada
 
 ### 4. Execute o Projeto
 
@@ -152,7 +155,7 @@ Quando você cadastra um cliente, a IA analisa:
 - Tom: Amigável
 - Contexto: "Cliente interessado em automação, orçamento até R$ 50k"
 
-**Saída do Google Generative AI:**
+**Saída da DeepSeek:**
 ```
 Oi João! 😊
 
@@ -196,27 +199,9 @@ npm run db:reset     # Reseta DB e popula novamente
 npm run lint         # Executa ESLint
 ```
 
-## 🔧 Configuração da IA
+## 🔧 Configuração Avançada
 
-### API Status e Monitoramento
-Para verificar o status da Google AI:
-
-```bash
-# Via navegador
-http://localhost:3000/api/test-env
-
-# Via curl
-curl http://localhost:3000/api/test-env
-```
-
-### Personalizando Prompts
-Edite `src/lib/vertex-ai.ts` para:
-- Ajustar prompts de mensagens
-- Mudar temperatura para respostas mais criativas ou precisas
-- Configurar parâmetros do modelo
-- Adicionar novas funções de IA
-
-### Configuração do Banco de Dados
+### Mudando o Banco de Dados
 Para usar PostgreSQL ao invés de SQLite:
 
 ```prisma
@@ -228,10 +213,22 @@ datasource db {
 ```
 
 ```env
-# .env.local
+# .env
 DATABASE_URL="postgresql://user:password@localhost:5432/crm_ia"
-GOOGLE_AI_API_KEY="sua-api-key-aqui"
 ```
+
+### Personalizando a IA
+Edite `src/lib/deepseek.ts` para:
+- Ajustar prompts
+- Mudar temperatura para respostas mais criativas ou precisas
+- Adicionar novas funções de IA
+- Configurar rate limiting
+
+### Adicionando Novos Campos
+1. Atualize `prisma/schema.prisma`
+2. Execute `npm run db:push`
+3. Atualize tipos em `src/types/crm.ts`
+4. Atualize componentes e APIs
 
 ## 🤝 Contribuindo
 
@@ -253,4 +250,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**🚀 Desenvolvido com ❤️ e Google AI para revolucionar a gestão de clientes!**
+**🚀 Desenvolvido com ❤️ e IA para revolucionar a gestão de clientes!**
