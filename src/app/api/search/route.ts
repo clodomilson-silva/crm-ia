@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { searchClients } from '@/lib/deepseek'
+import { searchClientsWithAI } from '@/lib/vertex-ai'
 
 export async function GET(request: Request) {
   try {
@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     })
 
     // Usar IA para busca semântica
-    const relevantClients = await searchClients(query, allClients)
+    const relevantClients = await searchClientsWithAI(query, allClients)
 
     // Buscar dados completos dos clientes relevantes
     const clients = await prisma.client.findMany({

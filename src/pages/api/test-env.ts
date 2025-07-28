@@ -1,6 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
+import { checkVertexAICredentials } from '@/lib/vertex-ai'
 
-export default function handler(req: NextApiRequest, res: NextApiResponse) {
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   // ⚠️ ATENÇÃO: Este endpoint é só para debug - REMOVER em produção!
   
   if (process.env.NODE_ENV === 'production') {
@@ -9,20 +10,32 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
     })
   }
 
+  // Verificar status da Google AI em tempo real
+  let googleAIStatus = '❌ Erro desconhecido'
+  let googleAIResponseTime = 0
+  
+  try {
+    const startTime = Date.now()
+    const isWorking = await checkVertexAICredentials()
+    googleAIResponseTime = Date.now() - startTime
+    googleAIStatus = isWorking ? '✅ Funcionando' : '⚠️ Não respondeu corretamente'
+  } catch (error) {
+    googleAIStatus = `❌ Erro: ${error instanceof Error ? error.message : 'Desconhecido'}`
+  }
+
   const envStatus = {
     nodeEnv: process.env.NODE_ENV,
-    hasKimiKey: !!process.env.KIMI_API_KEY,
-    hasOpenRouterKey: !!process.env.OPENROUTER_TNG_API_KEY,
+    hasGoogleAIKey: !!process.env.GOOGLE_AI_API_KEY,
     hasDatabaseUrl: !!process.env.DATABASE_URL,
     hasDirectUrl: !!process.env.DIRECT_URL,
     
-    // Mostrar apenas os primeiros e últimos caracteres para segurança
-    kimiKeyPreview: process.env.KIMI_API_KEY ? 
-      `${process.env.KIMI_API_KEY.substring(0, 8)}...${process.env.KIMI_API_KEY.slice(-8)}` : 
-      'Não configurada',
+    // Status em tempo real da Google AI
+    googleAIStatus,
+    googleAIResponseTime: `${googleAIResponseTime}ms`,
     
-    openRouterKeyPreview: process.env.OPENROUTER_TNG_API_KEY ? 
-      `${process.env.OPENROUTER_TNG_API_KEY.substring(0, 8)}...${process.env.OPENROUTER_TNG_API_KEY.slice(-8)}` : 
+    // Mostrar apenas os primeiros e últimos caracteres para segurança
+    googleAIKeyPreview: process.env.GOOGLE_AI_API_KEY ? 
+      `${process.env.GOOGLE_AI_API_KEY.substring(0, 12)}...${process.env.GOOGLE_AI_API_KEY.slice(-8)}` : 
       'Não configurada',
       
     databaseUrlPreview: process.env.DATABASE_URL ? 
@@ -31,7 +44,7 @@ export default function handler(req: NextApiRequest, res: NextApiResponse) {
   }
 
   res.status(200).json({
-    message: '🔍 Status das Variáveis de Ambiente',
+    message: '🔍 Status das APIs e Ambiente',
     timestamp: new Date().toISOString(),
     ...envStatus
   })

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import { analyzeClient } from '@/lib/deepseek'
+import { analyzeClient } from '@/lib/vertex-ai'
 import { CreateClientData } from '@/types/crm'
 
 export async function GET(request: Request) {

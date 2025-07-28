@@ -1,14 +1,15 @@
 # 🤖 CRM com IA - Sistema Inteligente de Gestão de Clientes
 
-Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **IA Multi-Provider**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
+Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **Google Generative AI**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
 
-## 🔥 **NOVIDADE**: Sistema Multi-API com Fallback Automático!
+## 🔥 **NOVA CONFIGURAÇÃO**: Google Generative AI Integrado!
 
-Este CRM agora suporta **múltiplos provedores de IA** com fallback automático:
-- 🥇 **DeepSeek R1** (OpenRouter) - Gratuita e avançada
-- 🥈 **DeepSeek Chat** (OpenRouter) - Gratuita e confiável  
+Este CRM agora utiliza **Google Generative AI (Gemini)** como provedor único de IA:
+- 🥇 **Gemini 1.5 Flash** - Rápido, confiável e poderoso
+- 🔑 **API Key Simples** - Configuração direta sem OAuth2  
+- 🌐 **Endpoint Direto** - `generativelanguage.googleapis.com`
 
-➡️ **[Veja como configurar as APIs](./APIS_CONFIG.md)**
+➡️ **API Key configurada:** `AIzaSyBf1GJuNXCejk7iIn3GLQHscyh2vISpxRk`
 
 ## ✨ Funcionalidades
 
@@ -20,7 +21,7 @@ Este CRM agora suporta **múltiplos provedores de IA** com fallback automático:
 | **📝 Gerar mensagem personalizada** | IA cria texto de e-mail, WhatsApp ou proposta comercial | ✅ |
 | **📅 Follow-up automatizado** | Agendamento de tarefas e mensagens com IA | ✅ |
 | **🔍 Pesquisa inteligente** | Busca com NLP para encontrar clientes por intenção | ✅ |
-| **🔄 Sistema Multi-API** | Fallback automático entre múltiplos provedores de IA | ✅ |
+| **🔄 Sistema Confiável** | Google Generative AI com alta disponibilidade | ✅ |
 
 ## 🚀 Como Executar
 
@@ -45,17 +46,14 @@ npm run db:push
 npm run db:seed
 ```
 
-### 3. Configure a API da DeepSeek
+### 3. Configure a API do Google
 
-Edite o arquivo `.env.local` e adicione sua chave da DeepSeek:
+A API Key já está configurada no sistema. Para verificar o status:
 
-```env
-DEEPSEEK_API_KEY=sk-sua-chave-aqui
+```bash
+# Testar configuração
+curl http://localhost:3000/api/test-env
 ```
-
-> 💡 **DeepSeek é 50-70% mais barato que OpenAI com qualidade similar!**
-> 
-> Veja o arquivo `DEEPSEEK_SETUP.md` para instruções detalhadas.
 
 ### 4. Execute o Projeto
 
@@ -154,7 +152,7 @@ Quando você cadastra um cliente, a IA analisa:
 - Tom: Amigável
 - Contexto: "Cliente interessado em automação, orçamento até R$ 50k"
 
-**Saída da DeepSeek:**
+**Saída do Google Generative AI:**
 ```
 Oi João! 😊
 
@@ -198,9 +196,27 @@ npm run db:reset     # Reseta DB e popula novamente
 npm run lint         # Executa ESLint
 ```
 
-## 🔧 Configuração Avançada
+## 🔧 Configuração da IA
 
-### Mudando o Banco de Dados
+### API Status e Monitoramento
+Para verificar o status da Google AI:
+
+```bash
+# Via navegador
+http://localhost:3000/api/test-env
+
+# Via curl
+curl http://localhost:3000/api/test-env
+```
+
+### Personalizando Prompts
+Edite `src/lib/vertex-ai.ts` para:
+- Ajustar prompts de mensagens
+- Mudar temperatura para respostas mais criativas ou precisas
+- Configurar parâmetros do modelo
+- Adicionar novas funções de IA
+
+### Configuração do Banco de Dados
 Para usar PostgreSQL ao invés de SQLite:
 
 ```prisma
@@ -212,22 +228,10 @@ datasource db {
 ```
 
 ```env
-# .env
+# .env.local
 DATABASE_URL="postgresql://user:password@localhost:5432/crm_ia"
+GOOGLE_AI_API_KEY="sua-api-key-aqui"
 ```
-
-### Personalizando a IA
-Edite `src/lib/deepseek.ts` para:
-- Ajustar prompts
-- Mudar temperatura para respostas mais criativas ou precisas
-- Adicionar novas funções de IA
-- Configurar rate limiting
-
-### Adicionando Novos Campos
-1. Atualize `prisma/schema.prisma`
-2. Execute `npm run db:push`
-3. Atualize tipos em `src/types/crm.ts`
-4. Atualize componentes e APIs
 
 ## 🤝 Contribuindo
 
@@ -249,4 +253,4 @@ Este projeto está sob a licença MIT. Veja o arquivo `LICENSE` para mais detalh
 
 ---
 
-**🚀 Desenvolvido com ❤️ e IA para revolucionar a gestão de clientes!**
+**🚀 Desenvolvido com ❤️ e Google AI para revolucionar a gestão de clientes!**

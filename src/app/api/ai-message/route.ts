@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server'
-import { generateMessage } from '@/lib/deepseek'
+import { generateAIMessage } from '@/lib/vertex-ai'
 
 export async function POST(req: Request) {
   try {
@@ -12,7 +12,7 @@ export async function POST(req: Request) {
       )
     }
 
-    const message = await generateMessage(clientName, messageType, context, tone)
+    const message = await generateAIMessage(clientName, messageType, context, tone)
 
     return NextResponse.json({ message })
   } catch (error) {

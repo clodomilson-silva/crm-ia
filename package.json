@@ -16,6 +16,8 @@
     "vercel-build": "prisma generate && prisma db push && next build"
   },
   "dependencies": {
+    "@google-cloud/aiplatform": "^5.0.0",
+    "@google/generative-ai": "^0.24.1",
     "@prisma/client": "^6.11.1",
     "@types/uuid": "^10.0.0",
     "axios": "^1.10.0",
