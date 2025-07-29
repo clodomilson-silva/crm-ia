@@ -91,16 +91,35 @@ export async function checkVertexAICredentials(): Promise<boolean> {
 // Função para gerar mensagens de IA
 export async function generateAIMessage(
   clientName: string,
-  messageType: 'welcome' | 'followup' | 'promotional' | 'support',
+  messageType: 'email' | 'whatsapp' | 'proposal',
   context: string,
   tone: 'formal' | 'casual' | 'friendly' = 'friendly'
 ): Promise<string> {
   
   const prompts = {
-    welcome: `Crie uma mensagem de boas-vindas ${tone} para o cliente ${clientName}. Contexto: ${context}. Seja caloroso e profissional.`,
-    followup: `Crie uma mensagem de follow-up ${tone} para ${clientName}. Contexto: ${context}. Demonstre interesse genuíno.`,
-    promotional: `Crie uma mensagem promocional ${tone} para ${clientName}. Contexto: ${context}. Seja persuasivo mas não invasivo.`,
-    support: `Crie uma mensagem de suporte ${tone} para ${clientName}. Contexto: ${context}. Seja prestativo e solucionador.`
+    email: `Crie um email ${tone} para o cliente ${clientName}. Contexto: ${context}. 
+    
+    Instruções:
+    - Use assunto atrativo
+    - Seja profissional mas ${tone}
+    - Inclua chamada para ação
+    - Formate como email completo`,
+    
+    whatsapp: `Crie uma mensagem de WhatsApp ${tone} para ${clientName}. Contexto: ${context}. 
+    
+    Instruções:
+    - Seja direto e objetivo
+    - Use linguagem ${tone}
+    - Máximo 3 parágrafos
+    - Inclua emojis apropriados se o tom for casual ou friendly`,
+    
+    proposal: `Crie uma proposta comercial ${tone} para ${clientName}. Contexto: ${context}. 
+    
+    Instruções:
+    - Estruture como proposta profissional
+    - Identifique problemas e soluções
+    - Inclua benefícios claros
+    - Termine com próximos passos`
   }
 
   if (!prompts[messageType]) {
