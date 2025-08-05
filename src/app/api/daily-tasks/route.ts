@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { convertToDateTime } from '@/lib/dateUtils'
+import { extractUserFromRequest } from '@/lib/auth'
 
 // Configuração da API OpenRouter (DeepSeek)
 const OPENROUTER_API_URL = 'https://openrouter.ai/api/v1/chat/completions'
@@ -345,9 +346,20 @@ async function generateFallbackTasks(client: {
 }
 
 // Endpoint GET para verificar status ou listar últimas tarefas geradas
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    const clientsCount = await prisma.client.count()
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
+    const clientsCount = await prisma.client.count({
+      where: {
+        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+        userId: user.userId
+      }
+    })
     
     return NextResponse.json({
       success: true,

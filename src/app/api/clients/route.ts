@@ -2,15 +2,24 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { analyzeClient } from '@/lib/vertex-ai'
 import { CreateClientData } from '@/types/crm'
+import { extractUserFromRequest } from '@/lib/auth'
+import { NextRequest } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const search = searchParams.get('search')
     const type = searchParams.get('type')
     const status = searchParams.get('status')
 
     const where: {
+      userId: string
       OR?: Array<{
         name?: { contains: string; mode: 'insensitive' }
         email?: { contains: string; mode: 'insensitive' }
@@ -18,7 +27,9 @@ export async function GET(request: Request) {
       }>
       clientType?: string
       status?: string
-    } = {}
+    } = {
+      userId: user.userId // Filtrar apenas clientes do usuário logado
+    }
     
     if (search) {
       where.OR = [
@@ -56,8 +67,14 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
     const data: CreateClientData = await request.json()
 
     // Validação básica
@@ -68,9 +85,13 @@ export async function POST(request: Request) {
       )
     }
 
-    // Verificar se email já existe
-    const existingClient = await prisma.client.findUnique({
-      where: { email: data.email },
+    // Verificar se email já existe para este usuário
+    const existingClient = await prisma.client.findFirst({
+      where: { 
+        email: data.email,
+        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+        userId: user.userId
+      },
     })
 
     if (existingClient) {
@@ -92,6 +113,8 @@ export async function POST(request: Request) {
     const client = await prisma.client.create({
       data: {
         ...data,
+        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+        userId: user.userId, // Associar cliente ao usuário
         leadScore: analysis.leadScore,
       },
       include: {
@@ -117,6 +140,8 @@ export async function POST(request: Request) {
       await prisma.task.create({
         data: {
           clientId: client.id,
+          // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+          userId: user.userId, // Associar tarefa ao usuário
           title: analysis.nextAction,
           description: analysis.reasoning,
           type: 'follow-up',

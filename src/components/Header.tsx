@@ -2,8 +2,9 @@
 
 import { useState } from 'react'
 import Image from 'next/image'
-import { Plus, User, Menu, X } from 'lucide-react'
+import { Plus, Menu, X } from 'lucide-react'
 import NotificationDropdown from './NotificationDropdown'
+import UserMenu from './UserMenu'
 
 interface HeaderProps {
   onNewClient: () => void
@@ -78,9 +79,7 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
               <span className="lg:hidden">Novo</span>
             </button>
 
-            <button className="p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-all duration-200">
-              <User className="w-5 h-5" />
-            </button>
+            <UserMenu />
           </div>
 
           {/* Mobile Actions */}
@@ -130,9 +129,7 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
               
               <div className="flex justify-center space-x-4 pt-2">
                 <NotificationDropdown onTaskClick={onTaskClick} />
-                <button className="p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-colors">
-                  <User className="w-5 h-5" />
-                </button>
+                <UserMenu />
               </div>
             </div>
           </div>

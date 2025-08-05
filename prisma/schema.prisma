@@ -11,10 +11,27 @@ datasource db {
   directUrl = env("DIRECT_URL")
 }
 
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  password  String
+  role      String   @default("user") // admin, user
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relacionamentos
+  clients     Client[]
+  tasks       Task[]
+  interactions Interaction[]
+
+  @@map("users")
+}
+
 model Client {
   id           String        @id @default(cuid())
   name         String
-  email        String        @unique
+  email        String        
   phone        String?
   clientType   String        // prospect, lead, customer, inactive
   leadScore    Int           @default(50)
@@ -24,9 +41,12 @@ model Client {
   updatedAt    DateTime      @updatedAt
   
   // Relacionamentos
+  userId       String
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   tasks        Task[]
   interactions Interaction[]
 
+  @@unique([email, userId]) // Email único por usuário
   @@map("clients")
 }
 
@@ -45,6 +65,8 @@ model Task {
   updatedAt        DateTime @updatedAt
   
   // Relacionamentos
+  userId           String
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   clientId         String
   client           Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 
@@ -60,6 +82,8 @@ model Interaction {
   createdAt   DateTime @default(now())
   
   // Relacionamentos
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   clientId    String
   client      Client   @relation(fields: [clientId], references: [id], onDelete: Cascade)
 

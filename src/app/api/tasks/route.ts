@@ -2,19 +2,30 @@ import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { CreateTaskData } from '@/types/crm'
 import { convertToDateTime } from '@/lib/dateUtils'
+import { extractUserFromRequest } from '@/lib/auth'
+import { NextRequest } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const clientId = searchParams.get('clientId')
     const status = searchParams.get('status')
     const priority = searchParams.get('priority')
 
     const where: {
+      userId: string
       clientId?: string
       status?: string
       priority?: string
-    } = {}
+    } = {
+      userId: user.userId // Filtrar apenas tarefas do usuário logado
+    }
     
     if (clientId) where.clientId = clientId
     if (status) where.status = status
@@ -44,8 +55,14 @@ export async function GET(request: Request) {
   }
 }
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
     const data: CreateTaskData = await request.json()
 
     if (!data.clientId || !data.title || !data.type) {
@@ -67,6 +84,8 @@ export async function POST(request: Request) {
     const task = await prisma.task.create({
       data: {
         clientId: data.clientId,
+        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+        userId: user.userId, // Associar tarefa ao usuário
         title: data.title,
         description: data.description || '',
         type: data.type,

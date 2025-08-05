@@ -1,9 +1,17 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import { searchClientsWithAI } from '@/lib/vertex-ai'
+import { extractUserFromRequest } from '@/lib/auth'
+import { NextRequest } from 'next/server'
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
   try {
+    // Verificar autenticação
+    const user = extractUserFromRequest(request)
+    if (!user) {
+      return NextResponse.json({ error: 'Não autorizado' }, { status: 401 })
+    }
+
     const { searchParams } = new URL(request.url)
     const query = searchParams.get('q')
 
@@ -14,8 +22,12 @@ export async function GET(request: Request) {
       )
     }
 
-    // Buscar todos os clientes primeiro
+    // Buscar todos os clientes do usuário primeiro
     const allClients = await prisma.client.findMany({
+      where: {
+        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+        userId: user.userId
+      },
       select: {
         id: true,
         name: true,
