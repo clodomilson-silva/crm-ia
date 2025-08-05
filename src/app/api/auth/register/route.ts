@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     }
 
     // Verificar se o usuário já existe
-    // @ts-expect-error - Prisma client types may be out of sync
     const existingUser = await prisma.user.findUnique({
       where: { email }
     })
@@ -34,7 +33,6 @@ export async function POST(req: Request) {
     const hashedPassword = await bcrypt.hash(password, 12)
 
     // Criar usuário
-    // @ts-expect-error - Prisma client types may be out of sync
     const user = await prisma.user.create({
       data: {
         name,

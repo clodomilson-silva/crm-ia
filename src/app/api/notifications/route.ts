@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     // Buscar tarefas atrasadas (vencimento anterior ao dia atual e status pending)
     const overdueTasks = await prisma.task.findMany({
       where: {
-        // @ts-expect-error - userId filter may not be recognized yet
+
         userId: user.userId,
         dueDate: {
           lt: today
@@ -50,7 +50,7 @@ export async function GET(request: NextRequest) {
 
     const todayPendingTasks = await prisma.task.findMany({
       where: {
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId,
         dueDate: {
           gte: todayStart,
@@ -89,13 +89,13 @@ export async function GET(request: NextRequest) {
         id: task.id,
         type: 'overdue',
         title: `Tarefa atrasada: ${task.title}`,
-        // @ts-expect-error - Client relation may not be recognized after Prisma regeneration
+
         message: `${task.client.name} - ${daysOverdue} dia(s) atrasada`,
         daysOverdue,
         priority: task.priority,
-        // @ts-expect-error - Client relation may not be recognized after Prisma regeneration
+
         clientName: task.client.name,
-        // @ts-expect-error - Client relation may not be recognized after Prisma regeneration
+
         clientId: task.client.id,
         taskId: task.id,
         dueDate: task.dueDate,
@@ -132,7 +132,7 @@ export async function GET(request: NextRequest) {
       overdueTasks: overdueTasks.map(task => ({
         id: task.id,
         title: task.title,
-        // @ts-expect-error - Client relation may not be recognized after Prisma regeneration
+
         clientName: task.client.name,
         dueDate: task.dueDate,
         priority: task.priority,
@@ -141,7 +141,7 @@ export async function GET(request: NextRequest) {
       todayTasks: todayPendingTasks.map(task => ({
         id: task.id,
         title: task.title,
-        // @ts-expect-error - Client relation may not be recognized after Prisma regeneration
+
         clientName: task.client.name,
         dueDate: task.dueDate,
         priority: task.priority

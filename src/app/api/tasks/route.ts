@@ -84,7 +84,7 @@ export async function POST(request: NextRequest) {
     const task = await prisma.task.create({
       data: {
         clientId: data.clientId,
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId, // Associar tarefa ao usuário
         title: data.title,
         description: data.description || '',

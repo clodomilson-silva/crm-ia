@@ -10,10 +10,12 @@
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "tsx prisma/seed.ts",
+    "db:seed-prod": "tsx prisma/seed-production.ts",
     "db:studio": "prisma studio",
     "db:reset": "prisma db push --force-reset && npm run db:seed",
     "db:force-seed": "tsx prisma/seed-force.ts",
-    "vercel-build": "prisma generate && prisma db push && next build"
+    "vercel-build": "prisma generate && prisma db push && npm run db:seed-prod && next build",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
     "@google-cloud/aiplatform": "^5.0.0",

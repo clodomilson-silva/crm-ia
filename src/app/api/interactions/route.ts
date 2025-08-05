@@ -81,7 +81,7 @@ export async function POST(request: NextRequest) {
     const interaction = await prisma.interaction.create({
       data: {
         clientId: prismaData.clientId,
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: prismaData.userId,
         type: prismaData.type,
         content: prismaData.content,

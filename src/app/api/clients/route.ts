@@ -89,7 +89,7 @@ export async function POST(request: NextRequest) {
     const existingClient = await prisma.client.findFirst({
       where: { 
         email: data.email,
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId
       },
     })
@@ -113,7 +113,7 @@ export async function POST(request: NextRequest) {
     const client = await prisma.client.create({
       data: {
         ...data,
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId, // Associar cliente ao usuário
         leadScore: analysis.leadScore,
       },
@@ -140,7 +140,7 @@ export async function POST(request: NextRequest) {
       await prisma.task.create({
         data: {
           clientId: client.id,
-          // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
           userId: user.userId, // Associar tarefa ao usuário
           title: analysis.nextAction,
           description: analysis.reasoning,

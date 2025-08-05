@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     // Buscar todos os clientes do usuário primeiro
     const allClients = await prisma.client.findMany({
       where: {
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId
       },
       select: {

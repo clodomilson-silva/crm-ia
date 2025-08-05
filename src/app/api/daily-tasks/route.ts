@@ -63,6 +63,16 @@ const getExistingTasksForClient = async (clientId: string) => {
 
 export async function POST(request: NextRequest) {
   try {
+    // Extrair usuário autenticado
+    const user = extractUserFromRequest(request)
+    
+    if (!user) {
+      return NextResponse.json(
+        { error: 'Usuário não autenticado' },
+        { status: 401 }
+      )
+    }
+    
     let targetClientId = null
     
     // Tentar ler o corpo da requisição, mas tratar como opcional
@@ -76,7 +86,10 @@ export async function POST(request: NextRequest) {
 
     // Buscar clientes do banco de dados
     const clients = await prisma.client.findMany({
-      where: targetClientId ? { id: targetClientId } : {},
+      where: {
+        userId: user.userId,
+        ...(targetClientId ? { id: targetClientId } : {}),
+      },
       select: {
         id: true,
         name: true,
@@ -217,6 +230,7 @@ Formato de resposta (JSON):
                     dueDate: taskDueDate,
                     aiSuggested: true,
                     clientId: client.id,
+                    userId: user.userId,
                   },
                   include: {
                     client: {
@@ -239,14 +253,14 @@ Formato de resposta (JSON):
           } catch (parseError) {
             console.error('Erro ao parsear resposta da IA:', parseError)
             // Fallback: criar tarefas genéricas
-            const fallbackTasks = await generateFallbackTasks(client)
+            const fallbackTasks = await generateFallbackTasks(client, user.userId)
             generatedTasks.push(...fallbackTasks)
           }
         }
       } catch (error) {
         console.error(`Erro ao gerar tarefas para ${client.name}:`, error)
         // Fallback: criar tarefas genéricas
-        const fallbackTasks = await generateFallbackTasks(client)
+        const fallbackTasks = await generateFallbackTasks(client, user.userId)
         generatedTasks.push(...fallbackTasks)
       }
     }
@@ -272,15 +286,18 @@ Formato de resposta (JSON):
 }
 
 // Função para gerar tarefas genéricas como fallback
-async function generateFallbackTasks(client: {
-  id: string
-  name: string
-  email: string
-  phone: string | null
-  clientType: string
-  leadScore: number
-  notes: string | null
-}) {
+async function generateFallbackTasks(
+  client: {
+    id: string
+    name: string
+    email: string
+    phone: string | null
+    clientType: string
+    leadScore: number
+    notes: string | null
+  },
+  userId: string
+) {
   const tomorrow = new Date()
   tomorrow.setDate(tomorrow.getDate() + 1)
 
@@ -304,6 +321,7 @@ async function generateFallbackTasks(client: {
       dueDate: tomorrow,
       aiSuggested: true,
       clientId: client.id,
+      userId: userId,
     },
     {
       title: `Enviar material comercial para ${client.name}`,
@@ -314,6 +332,7 @@ async function generateFallbackTasks(client: {
       dueDate: dayAfterTomorrow,
       aiSuggested: true,
       clientId: client.id,
+      userId: userId,
     }
   ]
 
@@ -356,7 +375,7 @@ export async function GET(request: NextRequest) {
 
     const clientsCount = await prisma.client.count({
       where: {
-        // @ts-expect-error userId será reconhecido após regeneração completa do Prisma
+
         userId: user.userId
       }
     })

@@ -17,7 +17,6 @@ export async function GET(req: NextRequest) {
     }
 
     // Buscar dados atualizados do usuário
-    // @ts-expect-error - Prisma client types may be out of sync
     const userData = await prisma.user.findUnique({
       where: { id: user.userId },
       select: {

@@ -18,7 +18,6 @@ export async function POST(req: Request) {
     }
 
     // Buscar usuário
-    // @ts-expect-error - Prisma client types may be out of sync
     const user = await prisma.user.findUnique({
       where: { email },
       select: {

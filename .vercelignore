@@ -8,6 +8,10 @@ node_modules
 prisma/dev.db
 backup_sqlite.sql
 TESTE_FUNCIONALIDADES.md
+prisma/seed.ts
+prisma/seed-force.ts
+scripts/create-overdue-tasks.ts
+dev-scripts/
 APIS_CONFIG.md
 DEEPSEEK_SETUP.md
 DEPLOY.md
