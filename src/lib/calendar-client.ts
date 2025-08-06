@@ -104,12 +104,14 @@ export const eventTemplates = {
 export const calendarService: CalendarService = {
   async createEvent(event: CalendarEvent): Promise<string | null> {
     try {
+      const accessToken = localStorage.getItem('google_calendar_token')
+      
       const response = await fetch('/api/calendar/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(event)
+        body: JSON.stringify({ ...event, accessToken })
       })
 
       const data = await response.json()
@@ -129,12 +131,14 @@ export const calendarService: CalendarService = {
 
   async updateEvent(eventId: string, event: Partial<CalendarEvent>): Promise<boolean> {
     try {
+      const accessToken = localStorage.getItem('google_calendar_token')
+      
       const response = await fetch('/api/calendar/update', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ eventId, event })
+        body: JSON.stringify({ eventId, event, accessToken })
       })
 
       const data = await response.json()
@@ -147,12 +151,14 @@ export const calendarService: CalendarService = {
 
   async deleteEvent(eventId: string): Promise<boolean> {
     try {
+      const accessToken = localStorage.getItem('google_calendar_token')
+      
       const response = await fetch('/api/calendar/delete', {
         method: 'DELETE',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ eventId })
+        body: JSON.stringify({ eventId, accessToken })
       })
 
       const data = await response.json()
@@ -165,7 +171,10 @@ export const calendarService: CalendarService = {
 
   async listEvents(timeMin?: string, timeMax?: string): Promise<CalendarEvent[]> {
     try {
+      const accessToken = localStorage.getItem('google_calendar_token')
       const params = new URLSearchParams()
+      
+      if (accessToken) params.append('accessToken', accessToken)
       if (timeMin) params.append('timeMin', timeMin)
       if (timeMax) params.append('timeMax', timeMax)
 

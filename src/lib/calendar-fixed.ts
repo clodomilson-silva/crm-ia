@@ -2,7 +2,24 @@ import { google } from 'googleapis'
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID
 const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET
-const GOOGLE_REDIRECT_URI = process.env.GOOGLE_REDIRECT_URI || `${process.env.NEXTAUTH_URL}/api/auth/google/callback`
+
+// Detectar automaticamente a URL de redirecionamento baseada no ambiente
+function getRedirectUri(): string {
+  // Se especificada explicitamente, usar essa
+  if (process.env.GOOGLE_REDIRECT_URI) {
+    return process.env.GOOGLE_REDIRECT_URI
+  }
+  
+  // Detectar automaticamente baseado no NEXTAUTH_URL ou NODE_ENV
+  const baseUrl = process.env.NEXTAUTH_URL || 
+                  (process.env.NODE_ENV === 'production' 
+                    ? 'https://clientpulse-cl.vercel.app' 
+                    : 'http://localhost:3001')
+  
+  return `${baseUrl}/api/auth/google/callback`
+}
+
+const GOOGLE_REDIRECT_URI = getRedirectUri()
 
 export interface CalendarEvent {
   summary: string

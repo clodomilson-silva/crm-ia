@@ -61,6 +61,32 @@ export default function CalendarIntegration() {
     }
     // Carregar eventos mesmo sem token (modo simulado)
     loadEvents()
+
+    // Listener para capturar tokens do OAuth
+    const handleOAuthMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return
+      
+      if (event.data.type === 'GOOGLE_OAUTH_SUCCESS') {
+        const { access_token, refresh_token } = event.data
+        if (access_token) {
+          localStorage.setItem('google_calendar_token', access_token)
+          if (refresh_token) {
+            localStorage.setItem('google_calendar_refresh_token', refresh_token)
+          }
+          setAccessToken(access_token)
+          loadEvents()
+          alert('Google Calendar conectado com sucesso!')
+        }
+      } else if (event.data.type === 'GOOGLE_OAUTH_ERROR') {
+        alert('Erro ao conectar com Google Calendar: ' + event.data.error)
+      }
+    }
+
+    window.addEventListener('message', handleOAuthMessage)
+    
+    return () => {
+      window.removeEventListener('message', handleOAuthMessage)
+    }
   }, [loadEvents])
 
   const handleGoogleAuth = async () => {
@@ -75,6 +101,14 @@ export default function CalendarIntegration() {
       console.error('Erro ao gerar URL de autenticação:', error)
       alert('Erro ao conectar com Google Calendar')
     }
+  }
+
+  const handleDisconnect = () => {
+    localStorage.removeItem('google_calendar_token')
+    localStorage.removeItem('google_calendar_refresh_token')
+    setAccessToken(null)
+    setEvents([])
+    alert('Google Calendar desconectado com sucesso!')
   }
 
   const createEvent = async () => {
@@ -183,13 +217,22 @@ export default function CalendarIntegration() {
               <span>Conectar Google</span>
             </button>
           ) : (
-            <button
-              onClick={() => setShowCreateForm(!showCreateForm)}
-              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium"
-            >
-              <Plus className="h-4 w-4" />
-              <span>Novo Evento</span>
-            </button>
+            <div className="flex items-center space-x-2">
+              <button
+                onClick={() => setShowCreateForm(!showCreateForm)}
+                className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-medium"
+              >
+                <Plus className="h-4 w-4" />
+                <span>Novo Evento</span>
+              </button>
+              <button
+                onClick={handleDisconnect}
+                className="text-gray-600 hover:text-gray-800 px-2 py-1 text-sm"
+                title="Desconectar Google Calendar"
+              >
+                Desconectar
+              </button>
+            </div>
           )}
         </div>
 
