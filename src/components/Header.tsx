@@ -27,27 +27,33 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
   }
 
   return (
-    <header className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-800 shadow-lg">
+    <header className="backdrop-blur-xl bg-gradient-to-r from-slate-900/95 via-blue-900/95 to-purple-900/95 border-b border-white/10 shadow-2xl z-header relative">
       <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
         <div className="flex justify-between items-center py-3 sm:py-4">
           {/* Logo e Brand */}
           <div className="flex items-center space-x-2 sm:space-x-4 min-w-0">
             <div className="flex items-center space-x-2 sm:space-x-3">
               <div className="relative flex-shrink-0">
-                <Image
-                  src="/logo.png"
-                  alt="ClientPulse Logo"
-                  width={40}
-                  height={40}
-                  className="sm:w-12 sm:h-12 rounded-lg shadow-md"
-                />
-                <div className="absolute -top-1 -right-1 w-2.5 h-2.5 sm:w-3 sm:h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></div>
+                {/* Container da logo com efeito glass */}
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-tr from-blue-500/30 to-purple-600/30 rounded-xl blur-sm"></div>
+                  <div className="relative backdrop-blur-sm bg-white/10 border border-white/20 rounded-xl p-2 shadow-xl">
+                    <Image
+                      src="/logo.png"
+                      alt="ClientPulse Logo"
+                      width={32}
+                      height={32}
+                      className="sm:w-8 sm:h-8 drop-shadow-lg"
+                    />
+                  </div>
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-gradient-to-r from-green-400 to-emerald-400 rounded-full border-2 border-white shadow-lg animate-pulse"></div>
               </div>
               <div className="min-w-0">
-                <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
-                  Client<span className="text-blue-200">Pulse</span>
+                <h1 className="text-lg sm:text-2xl font-bold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent truncate">
+                  Client<span className="bg-gradient-to-r from-blue-300 to-purple-300 bg-clip-text text-transparent">Pulse</span>
                 </h1>
-                <p className="text-blue-100 text-xs sm:text-sm font-medium hidden sm:block">
+                <p className="text-blue-200/80 text-xs sm:text-sm font-medium hidden sm:block">
                   Sistema Inteligente de Gestão de Clientes
                 </p>
               </div>
@@ -57,11 +63,11 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
           {/* Título da Seção Ativa - Desktop */}
           <div className="hidden lg:block flex-1 px-4">
             <div className="text-center">
-              <h2 className="text-xl font-semibold text-white">
+              <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-blue-200 bg-clip-text text-transparent">
                 {getActiveTabTitle()}
               </h2>
-              <div className="flex items-center justify-center mt-1">
-                <div className="w-8 h-0.5 bg-blue-300 rounded-full"></div>
+              <div className="flex items-center justify-center mt-2">
+                <div className="w-12 h-0.5 bg-gradient-to-r from-blue-400 to-purple-400 rounded-full shadow-lg"></div>
               </div>
             </div>
           </div>
@@ -72,7 +78,7 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
             
             <button
               onClick={onNewClient}
-              className="inline-flex items-center px-3 lg:px-6 py-2.5 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-all duration-200 font-semibold shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
+              className="inline-flex items-center px-3 lg:px-6 py-2.5 backdrop-blur-sm bg-white/20 hover:bg-white/30 border border-white/30 text-white rounded-xl transition-all duration-200 font-semibold shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 hover:scale-105"
             >
               <Plus className="w-4 h-4 mr-1 lg:mr-2" />
               <span className="hidden lg:inline">Novo Cliente</span>
@@ -88,14 +94,14 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
             
             <button
               onClick={onNewClient}
-              className="inline-flex items-center p-2 bg-white text-blue-700 rounded-lg hover:bg-blue-50 transition-colors"
+              className="inline-flex items-center p-2 backdrop-blur-sm bg-white/20 hover:bg-white/30 border border-white/30 text-white rounded-xl transition-colors shadow-lg"
             >
               <Plus className="w-4 h-4" />
             </button>
 
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="p-2 text-blue-100 hover:text-white hover:bg-blue-600/50 rounded-lg transition-colors"
+              className="p-2 text-blue-200 hover:text-white hover:bg-white/20 rounded-xl transition-colors backdrop-blur-sm"
             >
               {isMobileMenuOpen ? (
                 <X className="w-6 h-6" />

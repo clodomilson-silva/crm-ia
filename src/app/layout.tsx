@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
+import "@/styles/clientpulse.css";
 import "@/lib/suppressWarnings";
 import { CRMProvider } from "@/contexts/CRMContext";
 import { AuthProvider } from "@/contexts/AuthContext";
 import { PlanProvider } from "@/contexts/PlanContext";
+import { ThemeProvider } from "@/contexts/ThemeContext";
 import PlanModals from "@/components/PlanModals";
 
 const inter = Inter({
@@ -37,14 +39,16 @@ export default function RootLayout({
         className={`${inter.variable} font-sans antialiased bg-gradient-to-br from-gray-50 to-blue-50/30 min-h-screen`}
         suppressHydrationWarning={true}
       >
-        <AuthProvider>
-          <PlanProvider>
-            <CRMProvider>
-              {children}
-              <PlanModals />
-            </CRMProvider>
-          </PlanProvider>
-        </AuthProvider>
+        <ThemeProvider>
+          <AuthProvider>
+            <PlanProvider>
+              <CRMProvider>
+                {children}
+                <PlanModals />
+              </CRMProvider>
+            </PlanProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
