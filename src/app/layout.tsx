@@ -4,6 +4,8 @@ import "./globals.css";
 import "@/lib/suppressWarnings";
 import { CRMProvider } from "@/contexts/CRMContext";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { PlanProvider } from "@/contexts/PlanContext";
+import PlanModals from "@/components/PlanModals";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -36,9 +38,12 @@ export default function RootLayout({
         suppressHydrationWarning={true}
       >
         <AuthProvider>
-          <CRMProvider>
-            {children}
-          </CRMProvider>
+          <PlanProvider>
+            <CRMProvider>
+              {children}
+              <PlanModals />
+            </CRMProvider>
+          </PlanProvider>
         </AuthProvider>
       </body>
     </html>

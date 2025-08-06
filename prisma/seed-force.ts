@@ -47,6 +47,7 @@ async function main() {
         clientType: 'prospect',
         leadScore: 65,
         notes: 'Startup em crescimento, procura soluções de CRM. Orçamento limitado mas potencial de expansão.',
+        userId: adminUser.id,
       },
     }),
     prisma.client.create({
@@ -56,6 +57,7 @@ async function main() {
         clientType: 'customer',
         leadScore: 95,
         notes: 'Cliente ativo há 2 anos. Muito satisfeito com os serviços. Potencial para upsell.',
+        userId: adminUser.id,
       },
     }),
     prisma.client.create({
@@ -66,6 +68,7 @@ async function main() {
         clientType: 'prospect',
         leadScore: 45,
         notes: 'Primeiro contato feito via LinkedIn. Interesse demonstrado, mas baixo engajamento.',
+        userId: adminUser.id,
       },
     }),
     prisma.client.create({
@@ -76,6 +79,7 @@ async function main() {
         clientType: 'customer',
         leadScore: 90,
         notes: 'Cliente premium. Contrato de longo prazo renovado recentemente.',
+        userId: adminUser.id,
       },
     }),
   ])
@@ -88,6 +92,7 @@ async function main() {
     const interaction = await prisma.interaction.create({
       data: {
         clientId: client.id,
+        userId: adminUser.id,
         type: 'email',
         content: `Primeiro contato com ${client.name} realizado por email.`,
         outcome: 'positive',
@@ -112,6 +117,7 @@ async function main() {
     prisma.task.create({
       data: {
         clientId: clients[0].id,
+        userId: adminUser.id,
         title: 'Call de apresentação',
         description: 'Apresentar nossa solução de automação de processos',
         type: 'call',
@@ -123,6 +129,7 @@ async function main() {
     prisma.task.create({
       data: {
         clientId: clients[1].id,
+        userId: adminUser.id,
         title: 'Enviar proposta comercial',
         description: 'Proposta adaptada para startup com orçamento reduzido',
         type: 'email',
@@ -134,6 +141,7 @@ async function main() {
     prisma.task.create({
       data: {
         clientId: clients[2].id,
+        userId: adminUser.id,
         title: 'Reunião de check-in trimestral',
         description: 'Avaliar satisfação e identificar oportunidades de upsell',
         type: 'meeting',

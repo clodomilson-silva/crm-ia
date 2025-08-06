@@ -13,12 +13,15 @@ import Dashboard from '@/components/Dashboard'
 import APILimitsChecker from '@/components/APILimitsChecker'
 import RealtimeNotifications from '@/components/RealtimeNotifications'
 import ProtectedRoute from '@/components/ProtectedRoute'
+import FeatureGuard, { UsageLimit } from '@/components/FeatureGuard'
+import { usePlan } from '@/contexts/PlanContext'
 import { useAuth } from '@/contexts/AuthContext'
 
 type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search' | 'limits'
 
 export default function HomePage() {
   const { isAdmin } = useAuth()
+  const { currentPlan } = usePlan()
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
   const [showClientForm, setShowClientForm] = useState(false)
 
@@ -55,6 +58,36 @@ export default function HomePage() {
         />
 
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-6 lg:py-8">
+          {/* Informações do plano atual */}
+          <div className="mb-6 bg-white rounded-lg shadow-sm border p-4">
+            <div className="flex items-center justify-between">
+              <div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Plano Atual: {currentPlan === 'free' ? 'Gratuito' : 
+                               currentPlan === 'starter' ? 'Starter' : 
+                               currentPlan === 'pro' ? 'Pro' : 'Enterprise'}
+                </h3>
+                <p className="text-gray-600 text-sm">
+                  {currentPlan === 'free' && 'Faça upgrade para acessar mais funcionalidades'}
+                  {currentPlan === 'starter' && 'Acesso às funcionalidades básicas de IA'}
+                  {currentPlan === 'pro' && 'Acesso completo a todas as funcionalidades'}
+                  {currentPlan === 'enterprise' && 'Plano personalizado com suporte dedicado'}
+                </p>
+              </div>
+              {currentPlan === 'free' && (
+                <button
+                  onClick={() => {
+                    const event = new CustomEvent('openPlanModal')
+                    window.dispatchEvent(event)
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-sm font-medium transition-colors"
+                >
+                  Fazer Upgrade
+                </button>
+              )}
+            </div>
+          </div>
+
           {activeTab === 'dashboard' && <Dashboard />}
           
           {activeTab === 'clients' && (
@@ -69,14 +102,18 @@ export default function HomePage() {
                   Novo Cliente
                 </button>
               </div>
-              <ClientList />
+              <UsageLimit feature="leads" currentUsage={25}>
+                <ClientList />
+              </UsageLimit>
             </div>
           )}
 
           {activeTab === 'messages' && (
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Gerador de Mensagens</h1>
-              <MessageGenerator />
+              <FeatureGuard feature="hasAI">
+                <MessageGenerator />
+              </FeatureGuard>
             </div>
           )}
 
