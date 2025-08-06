@@ -8,6 +8,7 @@ interface User {
   name: string
   email: string
   role: 'admin' | 'user'
+  plan?: 'FREE' | 'PRO' | 'PREMIUM'
 }
 
 interface AuthContextType {
@@ -17,6 +18,8 @@ interface AuthContextType {
   logout: () => void
   loading: boolean
   isAdmin: boolean
+  isPremium: boolean
+  hasProAccess: boolean
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined)
@@ -40,7 +43,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       const response = await axios.get('/api/auth/me')
       setUser(response.data.user)
-    } catch (error) {
+    } catch {
       localStorage.removeItem('token')
       delete axios.defaults.headers.common['Authorization']
     } finally {
@@ -85,6 +88,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   const isAdmin = user?.role === 'admin'
+  const isPremium = user?.role === 'admin' || user?.plan === 'PREMIUM'
+  const hasProAccess = user?.role === 'admin' || user?.plan === 'PRO' || user?.plan === 'PREMIUM'
 
   return (
     <AuthContext.Provider value={{
@@ -93,7 +98,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       register,
       logout,
       loading,
-      isAdmin
+      isAdmin,
+      isPremium,
+      hasProAccess
     }}>
       {children}
     </AuthContext.Provider>

@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import { useAuth } from './AuthContext'
 
 export type PlanType = 'free' | 'starter' | 'pro' | 'enterprise'
 
@@ -86,17 +87,26 @@ const PLAN_FEATURES: Record<PlanType, PlanFeatures> = {
 }
 
 export function PlanProvider({ children }: { children: ReactNode }) {
+  const { isAdmin } = useAuth()
   const [currentPlan, setCurrentPlan] = useState<PlanType>('free')
 
   useEffect(() => {
+    // Admin sempre tem plano pro, outros carregam do localStorage
+    if (isAdmin) {
+      setCurrentPlan('pro')
+      return
+    }
+    
     // Carregar plano do usuário do localStorage ou API
     const savedPlan = localStorage.getItem('userPlan') as PlanType
     if (savedPlan && PLAN_FEATURES[savedPlan]) {
       setCurrentPlan(savedPlan)
     }
-  }, [])
+  }, [isAdmin])
 
-  const features = PLAN_FEATURES[currentPlan]
+  // Admin sempre usa features do plano pro
+  const effectivePlan = isAdmin ? 'pro' : currentPlan
+  const features = PLAN_FEATURES[effectivePlan]
 
   const upgradeToStarter = async (): Promise<boolean> => {
     try {
@@ -125,6 +135,9 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }
 
   const canUseFeature = (feature: keyof PlanFeatures): boolean => {
+    // Admin sempre pode usar qualquer feature
+    if (isAdmin) return true
+    
     if (feature === 'maxLeads' || feature === 'maxMessages') {
       return true // Estes são limites, não bloqueios
     }
@@ -132,17 +145,23 @@ export function PlanProvider({ children }: { children: ReactNode }) {
   }
 
   const getFeatureLimit = (feature: 'leads' | 'messages'): number => {
+    // Admin tem limites ilimitados
+    if (isAdmin) return -1
+    
     if (feature === 'leads') return features.maxLeads
     if (feature === 'messages') return features.maxMessages
     return 0
   }
 
   const isFeatureBlocked = (feature: keyof PlanFeatures): boolean => {
+    // Admin nunca tem features bloqueadas
+    if (isAdmin) return false
+    
     return !canUseFeature(feature)
   }
 
   const value: PlanContextType = {
-    currentPlan,
+    currentPlan: effectivePlan,
     features,
     upgradeToStarter,
     upgradeToPro,

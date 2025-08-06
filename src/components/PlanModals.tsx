@@ -7,15 +7,15 @@ import PlanModal from './PlanModal'
 import PaymentModal from './PaymentModal'
 
 export default function PlanModals() {
-  const { user } = useAuth()
+  const { user, isAdmin } = useAuth()
   const { currentPlan } = usePlan()
   const [showPlanModal, setShowPlanModal] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(false)
   const [selectedPlan, setSelectedPlan] = useState<'starter' | 'pro' | 'enterprise'>('starter')
 
-  // Mostrar modal de planos após o login (apenas para usuários gratuitos)
+  // Mostrar modal de planos após o login (apenas para usuários gratuitos, NÃO para admins)
   useEffect(() => {
-    if (user && currentPlan === 'free') {
+    if (user && currentPlan === 'free' && !isAdmin) {
       // Delay para dar tempo da tela carregar
       const timer = setTimeout(() => {
         setShowPlanModal(true)
@@ -23,17 +23,20 @@ export default function PlanModals() {
 
       return () => clearTimeout(timer)
     }
-  }, [user, currentPlan])
+  }, [user, currentPlan, isAdmin])
 
-  // Escutar evento global para abrir modal de planos
+  // Escutar evento global para abrir modal de planos (apenas para não-admins)
   useEffect(() => {
     const handleOpenPlanModal = () => {
-      setShowPlanModal(true)
+      // Só abrir modal se não for admin
+      if (!isAdmin) {
+        setShowPlanModal(true)
+      }
     }
 
     window.addEventListener('openPlanModal', handleOpenPlanModal)
     return () => window.removeEventListener('openPlanModal', handleOpenPlanModal)
-  }, [])
+  }, [isAdmin])
 
   const handleSelectPlan = (planId: string) => {
     const plan = planId as 'starter' | 'pro' | 'enterprise'

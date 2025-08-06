@@ -6,7 +6,7 @@ import Header from '@/components/Header'
 import Navigation from '@/components/Navigation'
 import ClientList from '@/components/ClientListModern'
 import ClientForm from '@/components/ClientForm'
-import MessageGenerator from '@/components/MessageGenerator'
+import MessageCenter from '@/components/MessageCenter'
 import TaskList from '@/components/TaskList'
 import SearchBar from '@/components/SearchBar'
 import Dashboard from '@/components/Dashboard'
@@ -15,15 +15,19 @@ import RealtimeNotifications from '@/components/RealtimeNotifications'
 import ProtectedRoute from '@/components/ProtectedRoute'
 import FeatureGuard, { UsageLimit } from '@/components/FeatureGuard'
 import { usePlan } from '@/contexts/PlanContext'
+import CalendarIntegration from '@/components/CalendarIntegration'
 import { useAuth } from '@/contexts/AuthContext'
 
-type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'search' | 'limits'
+type ActiveTab = 'dashboard' | 'clients' | 'messages' | 'tasks' | 'calendar' | 'search' | 'limits'
 
 export default function HomePage() {
   const { isAdmin } = useAuth()
   const { currentPlan } = usePlan()
   const [activeTab, setActiveTab] = useState<ActiveTab>('dashboard')
   const [showClientForm, setShowClientForm] = useState(false)
+
+  // Admin vê como pro, outros veem o plano real
+  const displayPlan = isAdmin ? 'pro' : currentPlan
 
   const handleClientCreated = () => {
     setShowClientForm(false)
@@ -33,7 +37,8 @@ export default function HomePage() {
     { id: 'dashboard', label: 'Dashboard', icon: Target },
     { id: 'clients', label: 'Clientes', icon: Users },
     { id: 'messages', label: 'Mensagens', icon: MessageSquare },
-    { id: 'tasks', label: 'Tarefas', icon: Calendar },
+    { id: 'tasks', label: 'Tarefas', icon: Activity },
+    { id: 'calendar', label: 'Calendário', icon: Calendar },
     { id: 'search', label: 'Busca', icon: Search },
     // Só mostrar API test para admins
     ...(isAdmin ? [{ id: 'limits', label: 'API Test', icon: Activity }] : [])
@@ -63,18 +68,18 @@ export default function HomePage() {
             <div className="flex items-center justify-between">
               <div>
                 <h3 className="text-lg font-semibold text-gray-900">
-                  Plano Atual: {currentPlan === 'free' ? 'Gratuito' : 
-                               currentPlan === 'starter' ? 'Starter' : 
-                               currentPlan === 'pro' ? 'Pro' : 'Enterprise'}
+                  Plano Atual: {displayPlan === 'free' ? 'Gratuito' : 
+                               displayPlan === 'starter' ? 'Starter' : 
+                               displayPlan === 'pro' ? 'Pro' : 'Enterprise'}
                 </h3>
                 <p className="text-gray-600 text-sm">
-                  {currentPlan === 'free' && 'Faça upgrade para acessar mais funcionalidades'}
-                  {currentPlan === 'starter' && 'Acesso às funcionalidades básicas de IA'}
-                  {currentPlan === 'pro' && 'Acesso completo a todas as funcionalidades'}
-                  {currentPlan === 'enterprise' && 'Plano personalizado com suporte dedicado'}
+                  {displayPlan === 'free' && 'Faça upgrade para acessar mais funcionalidades'}
+                  {displayPlan === 'starter' && 'Acesso às funcionalidades básicas de IA'}
+                  {displayPlan === 'pro' && 'Acesso completo a todas as funcionalidades'}
+                  {displayPlan === 'enterprise' && 'Plano personalizado com suporte dedicado'}
                 </p>
               </div>
-              {currentPlan === 'free' && (
+              {!isAdmin && displayPlan === 'free' && (
                 <button
                   onClick={() => {
                     const event = new CustomEvent('openPlanModal')
@@ -110,9 +115,9 @@ export default function HomePage() {
 
           {activeTab === 'messages' && (
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Gerador de Mensagens</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Centro de Mensagens</h1>
               <FeatureGuard feature="hasAI">
-                <MessageGenerator />
+                <MessageCenter />
               </FeatureGuard>
             </div>
           )}
@@ -121,6 +126,15 @@ export default function HomePage() {
             <div>
               <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Gestão de Tarefas</h1>
               <TaskList />
+            </div>
+          )}
+
+          {activeTab === 'calendar' && (
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-6">Google Calendar</h1>
+              <FeatureGuard feature="hasCalendarIntegration">
+                <CalendarIntegration />
+              </FeatureGuard>
             </div>
           )}
 

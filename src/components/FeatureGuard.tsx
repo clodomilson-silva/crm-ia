@@ -2,6 +2,7 @@
 
 import { ReactNode } from 'react'
 import { usePlan } from '@/contexts/PlanContext'
+import { useAuth } from '@/contexts/AuthContext'
 import { Lock, Crown, Zap } from 'lucide-react'
 
 interface FeatureGuardProps {
@@ -18,8 +19,10 @@ export default function FeatureGuard({
   showUpgradePrompt = true 
 }: FeatureGuardProps) {
   const { canUseFeature, currentPlan } = usePlan()
+  const { isAdmin } = useAuth()
 
-  if (canUseFeature(feature)) {
+  // Admins sempre têm acesso a todas as funcionalidades
+  if (isAdmin || canUseFeature(feature)) {
     return <>{children}</>
   }
 

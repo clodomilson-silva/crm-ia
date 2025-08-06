@@ -16,15 +16,42 @@ export function verifyToken(token: string) {
   }
 }
 
-export function extractUserFromRequest(req: NextRequest): { userId: string; role: string } | null {
+export interface UserAuth {
+  userId: string
+  role: 'admin' | 'user'
+  plan?: 'FREE' | 'PRO' | 'PREMIUM'
+  email?: string
+  name?: string
+}
+
+export function extractUserFromRequest(req: NextRequest): UserAuth | null {
   const authHeader = req.headers.get('authorization')
   
   if (!authHeader || !authHeader.startsWith('Bearer ')) {
-    return null
+    return null // Não retornar usuário se não houver token válido
   }
 
   const token = authHeader.substring(7)
-  return verifyToken(token)
+  const decoded = verifyToken(token)
+  
+  if (!decoded) return null
+  
+  // Verificar se é o token especial do admin
+  if (decoded.userId === 'demo-admin-123') {
+    return {
+      userId: 'demo-admin-123',
+      role: 'admin',
+      plan: 'PREMIUM',
+      email: 'admin@clientpulse.com',
+      name: 'Admin Demo'
+    }
+  }
+  
+  return {
+    userId: decoded.userId,
+    role: decoded.role as 'admin' | 'user',
+    plan: 'FREE' // Por padrão, usuários regulares começam no plano FREE
+  }
 }
 
 export function requireAuth(handler: (req: NextRequest & { userId: string; userRole: string }) => Promise<Response>) {

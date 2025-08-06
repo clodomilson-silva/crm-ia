@@ -16,7 +16,20 @@ export async function GET(req: NextRequest) {
       )
     }
 
-    // Buscar dados atualizados do usuário
+    // Se for usuário demo admin, retornar diretamente
+    if (user.userId === 'demo-admin-123') {
+      return NextResponse.json({
+        user: {
+          id: user.userId,
+          name: user.name || 'Admin Demo',
+          email: user.email || 'admin@clientpulse.com',
+          role: user.role,
+          plan: user.plan || 'PREMIUM'
+        }
+      })
+    }
+
+    // Buscar dados atualizados do usuário no banco
     const userData = await prisma.user.findUnique({
       where: { id: user.userId },
       select: {
@@ -35,7 +48,10 @@ export async function GET(req: NextRequest) {
     }
 
     return NextResponse.json({
-      user: userData
+      user: {
+        ...userData,
+        plan: user.role === 'admin' ? 'PREMIUM' : 'FREE'
+      }
     })
 
   } catch (error) {
