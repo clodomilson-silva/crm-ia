@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useAuth } from '@/contexts/AuthContext'
 import { Eye, EyeOff, Lock, Mail, User } from 'lucide-react'
+import Image from 'next/image'
 
 export default function LoginForm() {
   const [isLogin, setIsLogin] = useState(true)
@@ -58,14 +59,20 @@ export default function LoginForm() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-100 px-4">
       <div className="max-w-md w-full space-y-8">
         <div className="text-center">
-          <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center">
-            <Lock className="h-6 w-6 text-white" />
+          <div className="mx-auto mb-4">
+            <Image 
+              src="/logo.png" 
+              alt="ClientPulse" 
+              width={80}
+              height={80}
+              className="mx-auto"
+            />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            {isLogin ? 'CRM-IA' : 'Criar conta'}
+            {isLogin ? 'ClientPulse' : 'Criar conta'}
           </h2>
           <p className="mt-2 text-sm text-gray-600">
-            {isLogin ? 'Acesse sua conta para gerenciar clientes' : 'Crie sua conta e comece a usar'}
+            {isLogin ? 'Acesse sua conta para gerenciar clientes' : 'Crie sua conta e comece a usar o ClientPulse'}
           </p>
         </div>
 

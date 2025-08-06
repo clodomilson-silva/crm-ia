@@ -1,10 +1,10 @@
-# 🤖 CRM com IA - Sistema Inteligente de Gestão de Clientes
+# 🤖 ClientPulse - Sistema Inteligente de Gestão de Clientes
 
-Um mini CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **Google Generative AI**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
+Um sistema CRM moderno e inteligente construído com **Next.js**, **TypeScript**, **Prisma** e **Google Generative AI**, voltado para controle de clientes, geração de leads e automação de mensagens com auxílio de IA.
 
 ## 🔥 **NOVA CONFIGURAÇÃO**: Google Generative AI Integrado!
 
-Este CRM agora utiliza **Google Generative AI (Gemini)** como provedor único de IA:
+Este sistema ClientPulse agora utiliza **Google Generative AI (Gemini)** como provedor único de IA:
 - 🥇 **Gemini 1.5 Flash** - Rápido, confiável e poderoso
 - 🔑 **API Key Simples** - Configuração direta sem OAuth2  
 - 🌐 **Endpoint Direto** - `generativelanguage.googleapis.com`
@@ -27,7 +27,7 @@ Este CRM agora utiliza **Google Generative AI (Gemini)** como provedor único de
 
 ```bash
 git clone <seu-repositorio>
-cd crm-ia
+cd clientpulse
 npm install
 ```
 

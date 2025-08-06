@@ -85,7 +85,7 @@ export default function PlanModal({ isOpen, onClose, onSelectPlan }: PlanModalPr
   const handleSelectPlan = (planId: string) => {
     if (planId === 'enterprise') {
       // Para Enterprise, redirecionar para contato
-      window.open('mailto:contato@crm-ia.com?subject=Interesse no Plano Enterprise', '_blank')
+      window.open('mailto:contato@clientpulse.com?subject=Interesse no Plano Enterprise', '_blank')
       return
     }
     setSelectedPlan(planId)
@@ -99,7 +99,7 @@ export default function PlanModal({ isOpen, onClose, onSelectPlan }: PlanModalPr
           <div className="flex justify-between items-center">
             <div>
               <h2 className="text-3xl font-bold text-gray-900">Escolha seu plano</h2>
-              <p className="text-gray-600 mt-2">Desbloqueie todo o potencial do CRM-IA</p>
+              <p className="text-gray-600 mt-2">Desbloqueie todo o potencial do ClientPulse</p>
             </div>
             <button
               onClick={onClose}

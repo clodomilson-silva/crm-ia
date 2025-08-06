@@ -23,7 +23,7 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
       tasks: 'Central de Tarefas',
       search: 'Busca Inteligente'
     }
-    return titles[activeTab] || 'CRM com IA'
+    return titles[activeTab] || 'ClientPulse'
   }
 
   return (
@@ -36,7 +36,7 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
               <div className="relative flex-shrink-0">
                 <Image
                   src="/logo.png"
-                  alt="CRM IA Logo"
+                  alt="ClientPulse Logo"
                   width={40}
                   height={40}
                   className="sm:w-12 sm:h-12 rounded-lg shadow-md"
@@ -45,10 +45,10 @@ export default function Header({ onNewClient, activeTab, onTaskClick }: HeaderPr
               </div>
               <div className="min-w-0">
                 <h1 className="text-lg sm:text-2xl font-bold text-white truncate">
-                  CRM <span className="text-blue-200">AI</span>
+                  Client<span className="text-blue-200">Pulse</span>
                 </h1>
                 <p className="text-blue-100 text-xs sm:text-sm font-medium hidden sm:block">
-                  Sistema Inteligente de Gestão
+                  Sistema Inteligente de Gestão de Clientes
                 </p>
               </div>
             </div>

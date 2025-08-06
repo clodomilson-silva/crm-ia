@@ -15,10 +15,10 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "CRM AI - Sistema Inteligente de Gestão de Clientes",
-  description: "Sistema CRM com inteligência artificial para controle de clientes, geração de leads e automação de mensagens com DeepSeek",
-  keywords: "CRM, IA, Inteligência Artificial, Gestão de Clientes, DeepSeek, Automação",
-  authors: [{ name: "CRM AI Team" }],
+  title: "ClientPulse - Sistema Inteligente de Gestão de Clientes",
+  description: "ClientPulse: Sistema CRM com inteligência artificial para controle de clientes, geração de leads e automação de mensagens",
+  keywords: "ClientPulse, CRM, IA, Inteligência Artificial, Gestão de Clientes, Automação, Sistema de Vendas",
+  authors: [{ name: "ClientPulse Team" }],
 };
 
 export const viewport = {

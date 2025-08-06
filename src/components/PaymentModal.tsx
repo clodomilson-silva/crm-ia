@@ -200,7 +200,7 @@ export default function PaymentModal({ isOpen, onClose, selectedPlan, onPaymentS
                   <span className="text-gray-600">QR Code PIX</span>
                 </div>
                 <p className="font-mono text-sm bg-white p-2 rounded border">
-                  00020126330014BR.GOV.BCB.PIX2511crm@ia.com52040000530398654{selectedPlan.price.replace('R$ ', '').replace(',', '.')}5802BR5913CRM-IA6009SAO PAULO
+                  00020126330014BR.GOV.BCB.PIX2511contato@clientpulse.com52040000530398654{selectedPlan.price.replace('R$ ', '').replace(',', '.')}5802BR5913CLIENTPULSE6009SAO PAULO
                 </p>
               </div>
               <div className="flex items-center justify-center space-x-2 text-green-600">
